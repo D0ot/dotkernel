@@ -7,7 +7,7 @@ set(BOOT_DIR ${PROJECT_SOURCE_DIR}/boot)
 set(KERNEL_DIR ${PROJECT_SOURCE_DIR}/kernel)
 
 add_custom_target(bootloader ALL
-    COMMAND nasm -o ${BUILD_DIR}/mbr.bin ${BOOT_DIR}/start.s
+    COMMAND nasm -o ${BUILD_DIR}/mbr.bin ${BOOT_DIR}/start.s -I${PROJECT_SOURCE_DIR}/boot/
 )
 
 add_custom_target(osloader ALL
