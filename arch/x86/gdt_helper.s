@@ -17,7 +17,7 @@ DESC_TYPE_DATA_RDEXPD   equ         0x04 << 0x08 ;  Read-Only, expand-down
 DESC_TYPE_DATA_RDEXPDA  equ         0x05 << 0x08 ;  Read-Only, expand-down, accessed
 DESC_TYPE_DATA_RDWREXPD equ         0x06 << 0x08 ;  Read/Write, expand-down
 DESC_TYPE_DATA_RDWREXPDA equ        0x07 << 0x08 ;  Read/Write, expand-down, accessed
-DESC_TYPE_CODE_EX       equ         0x08 << 0x08 ;  Execute-OnlyPE
+DESC_TYPE_CODE_EX       equ         0x08 << 0x08 ;  Execute-Only
 DESC_TYPE_CODE_EXA      equ         0x09 << 0x08 ;  Execute-Only, accessed
 DESC_TYPE_CODE_EXRD     equ         0x0A << 0x08 ;  Execute/Read
 DESC_TYPE_CODE_EXRDA    equ         0x0B << 0x08 ;  Execute/Read, accessed

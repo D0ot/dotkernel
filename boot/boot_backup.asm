@@ -1,4 +1,4 @@
-%include "gdt_helper.s"
+%include "../arch/x86/gdt_helper.s"
 
 ; address
 BOOTLOADER_BASE     equ     0x7c00
@@ -6,11 +6,10 @@ STACK_BASE          equ     0x7c00
 OSLOADER_BASE       equ     0x8000
 
 
-; memory map
+; memory map in mbr and osloader stage
 ; 0x0500 - 0x7bff   : stack
 ; 0x7c00 - 0x7dff   : bootloader, mbr
-; 0x7e00 - 0x8000   : initial gdt table
-; 0x8000 - 0x9000   : os loader 
+; 0x8000 - 0x7fff   : os loader 
 
 ; 0x80000 - 0xFFFFF ; unusable
 
@@ -18,7 +17,15 @@ OSLOADER_BASE       equ     0x8000
 
 ; Bootloader starts here
 [BITS 16]
-section mbr vstart=BOOTLOADER_BASE
+
+global _start
+_start:
+section mbr
+    jmp _text_start
+
+
+section .text
+_text_start:
     mov ax, cs
     mov ds, ax
     mov es, ax
@@ -56,19 +63,25 @@ section mbr vstart=BOOTLOADER_BASE
     out 0x92, al
 
 ; set GDT
-    lgdt [gdt_addr]
+    lgdt [gdt_ptr]
 
 ; set PE bit
     mov eax, cr0
     or eax, 1b
     mov cr0, eax
 
-    jmp $
+_loop:
+    jmp _loop
     jmp dword (1 << 3):pmode_start
 
 
-[BITS 32]
 pmode_start:
+    mov ax, (2 << 3)
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov esp, STACK_BASE
+    jmp $
 
 
 [BITS 16]
@@ -128,6 +141,7 @@ read_disk_realmode:
 ; global descriptor 
 ; a data descriptor and a code descriptor
 
+section data
 
 ; flat 4G
 gdt_addr:
@@ -138,7 +152,7 @@ GDT_BASE            dd      0x0
 CODE_DESC           dd      0x0000ffff
                     dd      (0 << DESC_BASE_OFFSET2)+ \
                             DESC_TYPE_CODE_EX + \
-                            DESC_S_SYS + \
+                            DESC_S_USR + \
                             DESC_DPL_0 + \
                             DESC_P_SET + \
                             DESC_L_CLS + \
@@ -148,7 +162,7 @@ CODE_DESC           dd      0x0000ffff
 DATA_DESC           dd      0x0000ffff
                     dd      (0 << DESC_BASE_OFFSET2)+ \
                             DESC_TYPE_DATA_RDWR + \
-                            DESC_S_SYS + \
+                            DESC_S_USR + \
                             DESC_DPL_0 + \
                             DESC_P_SET + \
                             DESC_L_CLS + \
@@ -156,15 +170,10 @@ DATA_DESC           dd      0x0000ffff
                             (0 << DESC_BASE_OFFSET3)
 
 GDT_SIZE            equ     $ - GDT_BASE
-GDT_LIMIT           dd      GDT_SIZE - 1
+GDT_LIMIT           equ      GDT_SIZE - 1
 
 gdt_ptr:            dw      GDT_LIMIT
                     dd      gdt_addr
 
-
-
-
-    message db "Hello MBR"
-    message.size equ $-message
-    times 510-($-$$) db 0
-    db 0x55, 0xaa
+message db "Hello MBR"
+message.size equ $-message
