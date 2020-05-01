@@ -21,7 +21,7 @@ OSLOADER_BASE       equ     0x7e00
 global _start
 _start:
 section mbr
-    jmp _text_start
+    jmp 0x0:_text_start
 
 
 section .text
