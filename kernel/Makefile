@@ -1,9 +1,6 @@
 include ../configs/config.mk
 
-.PHONY : all clean
+.PHONY : all 
 
 all : 
 	echo "do nothing"
-
-clean : 
-	${CLEAN_CMD}

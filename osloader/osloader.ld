@@ -1,6 +1,6 @@
 OUTPUT_FORMAT("elf32-i386")
 OUTPUT_ARCH(i386)
-ENTRY(osloader_main)
+ENTRY(osloader_start)
 
 SECTIONS
 {
@@ -8,44 +8,18 @@ SECTIONS
 
     .entry :
     {
-        preboot/jumper.o(.text) /* it will  call main() */
+        osloader.o(.entry) /* it will  call main() */
     }
 
-    . = ALIGN(4);
     .text :
     {
-        *(.text .stub .text.* .gnu.linkonce.t.*)
+        osloader.o(.text)
     }
 
-    .rodata :
-    {
-        *(.rodata .rodata.* .gnu.linkonce.r.*)
-    }
-
-
-    . = ALIGN(4);
-    .bss :
-    {
-        *(.bss)
-    }
-
-
-    . = ALIGN(4);
     .data :
     {
-        *(.data)
+        osloader.o(.data)
     }
 
-
-    .check :
-    {
-        . = .;
-        BYTE(0xcc);
-    }
-
-    /DISCARD/ : 
-    {
-        *(.eh_frame)
-    }
 
 }

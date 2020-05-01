@@ -21,4 +21,4 @@ CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall -Wextra -Wno-address
 OBJCOPY_GENBIN_FLAGS = -O binary -S
 OBJCOPY_GENSYM_FLAGS = --only-keep-debug
 
-CLEAN_CMD = find . -maxdepth 1 | grep -e  "\.o" -e "\.elf" -e "\.bin" -e "\.debug" | xargs rm -f
+CLEAN_CMD = find . | grep -e  "\.o" -e "\.elf" -e "\.bin" -e "\.debug" | xargs rm -f
