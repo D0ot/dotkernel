@@ -1,6 +1,8 @@
 import gdb
 import os
 from elftools.elf.elffile import ELFFile
+from os import listdir
+from os.path import isfile, join, isdir
 
 
 def getSectionAddr(filename, section_name):
@@ -23,13 +25,30 @@ def myGDBAutoLoadSymFile(filename):
 
 
 def main():
+    # get project full path
+    project_path = os.getenv('DOTKERNEL_PATH')
+    # fixed setup
     gdb.execute('target remote localhost:1234')
     gdb.execute('set disassembly-flavor intel')
 
-    myGDBAutoLoadSymFile('debug/boot.debug')
-    #myGDBAutoLoadSymFile('debug/kernel.debug')
-    gdb.execute('dir boot')
-    gdb.execute('b _start')
-    gdb.execute('b main')
 
-main()
+    # symbol file load
+    symbol_file_dir = join(project_path, 'debug')
+    for f in listdir(symbol_file_dir):
+        full_path = join(symbol_file_dir, f)
+        if(isfile(full_path)):
+            myGDBAutoLoadSymFile(full_path)
+    
+    # source directory load
+    for f in listdir(project_path):
+        full_path = join(project_path, f)
+        if isdir(full_path):
+            temp_cmd = 'dir ' + full_path
+            print(temp_cmd)
+            gdb.execute(temp_cmd)
+
+
+    gdb.execute('b _start')
+
+if __name__ == "__main__":
+    main()
