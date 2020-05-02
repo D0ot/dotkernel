@@ -1,0 +1,4 @@
+ata0-master: type=disk, path=build/img.bin
+gdbstub: enabled=1
+boot: disk
+

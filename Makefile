@@ -16,10 +16,17 @@ all :
 	dd if=osloader/osloader.bin of=${IMG_BIN} bs=512 conv=notrunc seek=1
 
 
-debug: export DOTKERNEL_PATH = $(project_path)
-debug:
-	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/test.sh
+qdebug: export DOTKERNEL_PATH = $(project_path)
+qdebug: all
+	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/run_qemu.sh
 	gnome-terminal --geometry=130x80+1600+0 -- ./scripts/debugp.sh 
+
+bdebug: export DOTKERNEL_PATH = $(project_path)
+bdebug: all
+	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/run_bochs.sh
+	gnome-terminal --geometry=130x80+1600+0 -- ./scripts/debugp.sh 
+
+
 
 clean:
 	${CLEAN_CMD}

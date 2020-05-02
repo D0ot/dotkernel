@@ -5,9 +5,10 @@
  */
 #include "../arch/x86/x86.h"
 
+
 void osloader_main(void)
 {
-    uint32_t counter = 0;
+    int counter = 0;
     while(1)
     {
         counter++;

@@ -1,6 +1,9 @@
 include ../configs/config.mk
 
-objects = osloader.o 
+asm_obj = osloader.o  protected.o
+c_ojb = load.o 
+
+
 
 .PHONY : all obj 
 
@@ -13,14 +16,16 @@ osloader.debug : osloader.elf
 	${OBJCOPY} ${OBJCOPY_GENSYM_FLAGS} $< $@
 	cp osloader.debug ../debug/
 
-osloader.elf : ${objects} osloader.ld
-	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${objects}
+osloader.elf : ${asm_obj} ${c_ojb} osloader.ld
+	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj ${c_ojb}}
 
 
-${objects} : %.o : %.asm
+${asm_obj} : %.o : %.asm
 	${AS} ${AS_ELF_FLAGS} $< -o $@ 
 
+${c_ojb} : %.o : %.c
+	${CC} -c $< -o $@ ${CC_FLAGS}
 
-obj : ${objects}
+obj : ${asm_obj} ${c_ojb}
 
 
