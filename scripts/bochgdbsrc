@@ -1,4 +1,5 @@
 ata0-master: type=disk, path=build/img.bin
-gdbstub: enabled=1
 boot: disk
+com1: enabled=1, mode=file, dev=com1.log
+gdbstub: enabled=1
 

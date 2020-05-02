@@ -2,6 +2,7 @@ OUTPUT_FORMAT("elf32-i386")
 OUTPUT_ARCH(i386)
 ENTRY(_osloader_start)
 
+
 SECTIONS
 {
     . = 0x7e00;
@@ -11,16 +12,44 @@ SECTIONS
         osloader.o(.text)
     }
 
-    .data :
-    {
-        osloader.o(.data)
-    }
-
+    . = ALIGN(0x10);
     .gdt_data : 
     {
         osloader.o(.gdt_data)
     }
 
+    /* must align it */
+    . = ALIGN(16);
+    .text2 :
+    {
+        load.o(.text)
+    }
 
+
+    . = ALIGN(4);
+    .data :
+    {
+        *(.data)
+    }
+
+    . = ALIGN(4);
+    .rodata :
+    {
+        *(.rodata .rodata.* .gnu.linkonce.r.*)
+    }
+
+    . = ALIGN(4);
+    .bss :
+    {
+        *(.bss)
+    }
+
+
+    /DISCARD/ : 
+    {
+        *(.eh_frame)
+    }
+
+   
 
 }
