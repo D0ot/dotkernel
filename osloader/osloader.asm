@@ -3,7 +3,7 @@
 ;                   equ     ;
 ARDS_ADDR           equ     0x7e00 + 0x1400
 
-extern _pmode_start
+extern osloader_main
 
 [BITS 16]
 
@@ -17,6 +17,10 @@ text_start:
     mov es, ax
     mov di, ARDS_ADDR
     call get_meminfo
+
+
+; disable interrupts
+    cli
 
 ; to enable Protected Mode
 ; open A20
@@ -41,11 +45,7 @@ _flush:
     mov es, ax
     mov ss, ax
     mov esp, 0x7c00
-    jmp $
-
-    
-    
-    ;jmp dword (1 << 3):_pmode_start
+    call osloader_main
 
 
 
