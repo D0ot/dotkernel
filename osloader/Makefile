@@ -1,7 +1,7 @@
 include ../configs/config.mk
 
-asm_obj = osloader.o  protected.o
-c_ojb = load.o 
+asm_obj = osloader.o
+#c_ojb = 
 
 
 
@@ -17,14 +17,15 @@ osloader.debug : osloader.elf
 	cp osloader.debug ../debug/
 
 osloader.elf : ${asm_obj} ${c_ojb} osloader.ld
-	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj ${c_ojb}}
+	#${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj} ${c_ojb}
+	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj}
 
 
 ${asm_obj} : %.o : %.asm
 	${AS} ${AS_ELF_FLAGS} $< -o $@ 
 
-${c_ojb} : %.o : %.c
-	${CC} -c $< -o $@ ${CC_FLAGS}
+#${c_ojb} : %.o : %.c
+#	${CC} -c $< -o $@ ${CC_FLAGS}
 
 obj : ${asm_obj} ${c_ojb}
 

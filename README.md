@@ -15,3 +15,7 @@ mbr content, most of them are in `boot` directory
 ### osloader-dev
 
 osloader content, most of them are in `osloader` directory
+
+### base-dev
+
+things like Makefile, things in `script` driectory

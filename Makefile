@@ -24,8 +24,11 @@ qdebug: all
 bdebug: export DOTKERNEL_PATH = $(project_path)
 bdebug: all
 	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/run_bochs.sh
-	gnome-terminal --geometry=130x80+1600+0 -- ./scripts/debugp.sh 
 
+gdebug: export DOTKERNEL_PATH = $(project_path)
+gdebug: all
+	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/run_bochs-gdb.sh
+	gnome-terminal --geometry=130x80+1600+0 -- ./scripts/debugp.sh 
 
 
 clean:

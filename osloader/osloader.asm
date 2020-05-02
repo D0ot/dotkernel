@@ -31,13 +31,28 @@ text_start:
     mov eax, cr0
     or eax, 1b
     mov cr0, eax
-    jmp dword (1 << 3):_pmode_start
+    jmp dword (1 << 3):_flush
+
+
+[BITS 32]
+_flush:
+    mov ax, (2 << 3)
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov esp, 0x7c00
+    jmp $
+
+    
+    
+    ;jmp dword (1 << 3):_pmode_start
 
 
 
 
 ; \brief get memory infomation of the machine
 ; \param es:di is buffer, first 4 bytes is numbre of entries in list, the following it is ARDS entrie
+[BITS 16]
 ards_size           equ     24
 get_meminfo:
             xor bp, bp
@@ -103,7 +118,7 @@ get_meminfo:
 
 
 ; content about gdt
-section gdt_data
+section .gdt_data
 
 ; flat 4G
 gdt_addr:
@@ -117,10 +132,8 @@ CODE_DESC           dd      0x0000ffff
                             DESC_S_USR + \
                             DESC_DPL_0 + \
                             DESC_P_SET + \
-                            (0xf << DESC_BASE_OFFSET1) + \
                             DESC_L_CLS + \
                             DESC_G_4K + \
-                            DESC_DB_B + \
                             (0 << DESC_BASE_OFFSET3)
 
 DATA_DESC           dd      0x0000ffff
@@ -129,10 +142,8 @@ DATA_DESC           dd      0x0000ffff
                             DESC_S_USR + \
                             DESC_DPL_0 + \
                             DESC_P_SET + \
-                            (0xf << DESC_BASE_OFFSET1) + \
                             DESC_L_CLS + \
                             DESC_G_4K + \
-                            DESC_DB_B + \
                             (0 << DESC_BASE_OFFSET3)
 
 GDT_SIZE            equ     $ - GDT_BASE
