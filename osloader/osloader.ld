@@ -2,8 +2,6 @@ OUTPUT_FORMAT("elf32-i386")
 OUTPUT_ARCH(i386)
 ENTRY(_osloader_start)
 
-when location of gdt changed, it can be running.
-
 SECTIONS
 {
     . = 0x7e00;
@@ -26,12 +24,6 @@ SECTIONS
         load.o(.text)
     }
 
-    . = ALIGN(16);
-    .text3 :
-    {
-        uart.o(.text)
-    }
-
     . = ALIGN(4);
     .data :
     {
@@ -50,12 +42,15 @@ SECTIONS
         *(.bss)
     }
 
+    . = ALIGN(4);
+    .bss :
+    {
+        *(.bss)
+    }
 
     /DISCARD/ : 
     {
         *(.eh_frame)
     }
-
-   
 
 }
