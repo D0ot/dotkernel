@@ -9,15 +9,28 @@ int test();
 void osloader_main(void)
 {
     int counter = 0;
+    int counter2 = 0;
+    int counter3 = 0;
     int sign = test();
     while(1)
     {
-        counter++;
+        counter += sign;
+        counter2++;
+        if(counter2 % 2 == 0)
+        {
+            counter3++;
+        }
     }
 }
 
 
 int test()
 {
-    return 123;
+    int a = 10;
+    int sum = 0;
+    while(a--)
+    {
+        sum +=a;
+    }
+    return sum;
 }
