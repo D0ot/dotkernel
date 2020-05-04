@@ -1,7 +1,7 @@
 # manuallly set
 DIR_PATH=/home/doot/sysmaking/dotkernel
 
-TOOLS_PREFIX = /usr/local/cross/bin/i686-elf-
+TOOLS_PREFIX = /usr/local/cross/9.3.0/bin/i686-elf-
 
 IMG_BIN = build/img.bin
 KERNEL_ELF = build/kernel.elf
