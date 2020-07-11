@@ -46,6 +46,8 @@ _flush:
     mov ss, ax
     mov esp, 0x7c00
     call osloader_main
+_inf_loop:
+    jmp _inf_loop
 
 
 

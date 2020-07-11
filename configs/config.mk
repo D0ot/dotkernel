@@ -1,6 +1,3 @@
-# manuallly set
-DIR_PATH=/home/doot/sysmaking/dotkernel
-
 TOOLS_PREFIX = /usr/local/cross/9.3.0/bin/i686-elf-
 
 IMG_BIN = build/img.bin
@@ -16,7 +13,7 @@ OBJCOPY = ${TOOLS_PREIFX}objcopy
 AS_ELF_FLAGS = -f elf32 -F dwarf -g
 AS_BIN_FLAGS = -f bin
 LINK_FLAGS = -nostdlib -g
-CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall -Wextra -Wno-address-of-packed-member -g -O0
+CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall -Wextra -Wno-address-of-packed-member -g -O0 -I${project_path}
 
 OBJCOPY_GENBIN_FLAGS = -O binary -S
 OBJCOPY_GENSYM_FLAGS = --only-keep-debug

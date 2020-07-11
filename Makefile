@@ -1,5 +1,6 @@
 makefile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 project_path := $(dir $(makefile_path))
+export
 
 include configs/config.mk
 

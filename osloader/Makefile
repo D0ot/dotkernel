@@ -1,8 +1,7 @@
 include ../configs/config.mk
 
 asm_obj = osloader.o
-c_ojb = load.o
-
+c_ojb = load.o uart.o ../libs/common.o ../libs/disk.o
 
 
 .PHONY : all obj 
