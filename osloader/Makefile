@@ -1,8 +1,7 @@
 include ../configs/config.mk
 
 asm_obj = osloader.o
-c_ojb = load.o uart.o ../libs/common.o ../libs/disk.o
-
+c_obj = load.o uart.o ../libs/common.o ../libs/disk.o
 
 .PHONY : all obj 
 
@@ -13,18 +12,17 @@ osloader.bin : osloader.elf
 
 osloader.debug : osloader.elf
 	${OBJCOPY} ${OBJCOPY_GENSYM_FLAGS} $< $@
-	cp osloader.debug ../debug/
+	cp $@ ../debug/
 
-osloader.elf : ${asm_obj} ${c_ojb} osloader.ld
-	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj} ${c_ojb}
-
+osloader.elf : ${asm_obj} ${c_obj} osloader.ld
+	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj} ${c_obj}
 
 ${asm_obj} : %.o : %.asm
 	${AS} ${AS_ELF_FLAGS} $< -o $@ 
 
-${c_ojb} : %.o : %.c
+${c_obj} : %.o : %.c
 	${CC} -c $< -o $@ ${CC_FLAGS}
 
-obj : ${asm_obj} ${c_ojb}
+obj : ${asm_obj} ${c_obj}
 
 

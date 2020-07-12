@@ -42,12 +42,6 @@ SECTIONS
         *(.bss)
     }
 
-    . = ALIGN(4);
-    .bss :
-    {
-        *(.bss)
-    }
-
     /DISCARD/ : 
     {
         *(.eh_frame)

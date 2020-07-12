@@ -9,7 +9,7 @@ typedef void(*out_func_ptr)(char);
 void putchar(char ch);
 
 int sprintf(char *str, const char* format, ...);
-int printf(const char* format, ...);
+int printf_func(const char* format, out_func_ptr f, ...);
 
 int v_sprintf(char *str, const char* format, va_list ap);
 int v_printf(const char *format, va_list ap);

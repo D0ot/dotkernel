@@ -3,7 +3,6 @@
 #include <stdarg.h>
 #include "common.h"
 
-void putchar(char c);
 
 int sprintf(char *str, const char* format, ...)
 {
@@ -78,12 +77,12 @@ int v_sprintf(char *str, const char* format, va_list ap)
 
 }
 
-int printf(const char* format, ...)
+int printf_func(const char* format, out_func_ptr f, ...)
 {
     int ret;
     va_list ap;
     va_start(ap, format);
-    ret = v_printf_callback(format, putchar, ap);
+    ret = v_printf_callback(format, f, ap);
     va_end(ap);
     return ret;
 

@@ -12,9 +12,12 @@ all :
 	cd kernel && make
 
 	# loader consists of mbr and osloader
-	dd if=/dev/zero of=${IMG_BIN} bs=1024 count=1024 conv=notrunc
+	dd if=/dev/zero of=${IMG_BIN} bs=512 count=20480 conv=notrunc
 	dd if=boot/boot.bin of=${IMG_BIN} bs=512 count=1 conv=notrunc seek=0
 	dd if=osloader/osloader.bin of=${IMG_BIN} bs=512 conv=notrunc seek=1
+
+	# kernel elf file
+	dd if=kernel/kernel.elf of=${IMG_BIN} bs=512 conv=notrunc seek=1024
 
 
 qdebug: export DOTKERNEL_PATH = $(project_path)
