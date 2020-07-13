@@ -1,7 +1,8 @@
 include ../configs/config.mk
 
 asm_obj = osloader.o
-c_obj = load.o ../libs/uart.o ../libs/common.o ../libs/disk.o
+c_obj = load.o ../libs/uart.o ../libs/common.o ../libs/disk.o ../libs/log.o \
+		../libs/paging.o
 
 .PHONY : all obj 
 

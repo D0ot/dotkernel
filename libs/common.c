@@ -41,9 +41,10 @@ int v_sprintf(char *str, const char* format, va_list ap)
 
             case 'x': // integer, hex form
                 utoa(va_arg(ap, unsigned), buf, 16);
-                strcpy(str, buf);
+                strcpy(str, "0x");
+                strcpy(str + 2, buf);
                 format += 2;
-                str += strlen(buf); 
+                str += strlen(buf) + 2; 
                 break;
 
             case 's':

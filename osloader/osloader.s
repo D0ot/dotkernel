@@ -14,7 +14,7 @@ _osloader_start:
 text_start:
     xor ax, ax
     mov es, ax
-    mov di, ARDS_ADDR
+    mov di, SMAP_ADDR
     call get_meminfo
 
 
@@ -52,15 +52,14 @@ _inf_loop:
 
 
 ; \brief get memory infomation of the machine
-; \param es:di is buffer, first 4 bytes is numbre of entries in list, the following it is ARDS entrie
+; \param es:di is buffer, first 4 bytes is numbre of entries in list, the following it is SMAP entrie
 [BITS 16]
-ards_size           equ     24
 get_meminfo:
             xor bp, bp
 
             mov eax, 0xe820
             xor ebx, ebx
-            mov ecx, ards_size 
+            mov ecx, SMAP_ENTRY_SIZE
             mov edx, 0x534d4150
             mov es, bx
             push di
