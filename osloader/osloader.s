@@ -1,7 +1,6 @@
 %include "../arch/x86/gdt_helper.s"
+%include "../defs/defs.s"
 
-;                   equ     ;
-ARDS_ADDR           equ     0x7e00 + 0x1400
 
 extern osloader_main
 

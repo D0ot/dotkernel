@@ -8,7 +8,7 @@ def write2doth(f, content):
         if counter % 2 == 0:
             towrite.append("#define " + x)
         else:
-            towrite[-1] = towrite[-1] + "\t" + x 
+            towrite[-1] = towrite[-1] + "\t(" + x + ")"
         counter = counter + 1
     towrite.append("#endif")
 
