@@ -7,6 +7,7 @@ include configs/config.mk
 .PHONY : all clean debug
 
 all : 
+	python3 scripts/mkdefs.py defs/defs.conf defs/defs.s defs/defs.h
 	cd boot && make 
 	cd osloader && make
 	cd kernel && make

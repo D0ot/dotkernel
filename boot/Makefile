@@ -17,7 +17,7 @@ boot.elf : ${objects} boot.ld
 	${LD} ${LINK_FLAGS} -T boot.ld -o $@ ${objects}
 
 
-${objects} : %.o : %.asm
+${objects} : %.o : %.s
 	${AS} ${AS_ELF_FLAGS} $< -o $@ 
 
 

@@ -81,7 +81,7 @@ int printf_func(const char* format, out_func_ptr f, ...)
 {
     int ret;
     va_list ap;
-    va_start(ap, format);
+    va_start(ap, f);
     ret = v_printf_callback(format, f, ap);
     va_end(ap);
     return ret;

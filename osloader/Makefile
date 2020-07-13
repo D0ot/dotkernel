@@ -1,7 +1,7 @@
 include ../configs/config.mk
 
 asm_obj = osloader.o
-c_obj = load.o uart.o ../libs/common.o ../libs/disk.o
+c_obj = load.o ../libs/uart.o ../libs/common.o ../libs/disk.o
 
 .PHONY : all obj 
 
@@ -17,7 +17,7 @@ osloader.debug : osloader.elf
 osloader.elf : ${asm_obj} ${c_obj} osloader.ld
 	${LD} ${LINK_FLAGS} -T osloader.ld -o $@ ${asm_obj} ${c_obj}
 
-${asm_obj} : %.o : %.asm
+${asm_obj} : %.o : %.s
 	${AS} ${AS_ELF_FLAGS} $< -o $@ 
 
 ${c_obj} : %.o : %.c

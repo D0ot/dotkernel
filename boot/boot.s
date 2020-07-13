@@ -1,9 +1,7 @@
 %include "../arch/x86/gdt_helper.s"
+%include "../defs/defs.s"
 
 ; address
-BOOTLOADER_BASE     equ     0x7c00
-STACK_BASE          equ     0x7c00
-OSLOADER_BASE       equ     0x7e00
 
 
 ; memory map in mbr and osloader stage
