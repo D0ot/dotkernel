@@ -3,36 +3,36 @@
 
 #include <stdint.h>
 
-// here starts the inline asm functions
+// here starts the inline __asm__ functions
 
 
 static inline uint8_t x86_inb(uint16_t port)
 {
     uint8_t data;
-    asm volatile ("in %0, %1;" : "=a"(data) : "d"(port));
+    __asm__ volatile ("in %0, %1;" : "=a"(data) : "d"(port));
     return data;
 }
 
 static inline void x86_outb(uint16_t port, uint8_t data)
 {
-    asm volatile ("out %1, %0;" : : "a"(data), "d"(port));
+    __asm__ volatile ("out %1, %0;" : : "a"(data), "d"(port));
 }
 
 static inline uint16_t x86_inw(uint16_t port)
 {
     uint16_t data;
-    asm volatile ("in %0, %1;": "=a"(data) : "d"(port));
+    __asm__ volatile ("in %0, %1;": "=a"(data) : "d"(port));
     return data;
 }
 
 static inline void x86_outw(uint16_t port, uint16_t data)
 {
-    asm volatile ("out %1, %0;" : : "a"(data), "d"(port));
+    __asm__ volatile ("out %1, %0;" : : "a"(data), "d"(port));
 }
 
 static inline void x86_insw(uint16_t port, uint16_t *buf, uint32_t count_byte)
 {
-    asm volatile (
+    __asm__ volatile (
         "cld;"
         "rep insw;"
         : "=D"(buf), "=c"(count_byte) 
@@ -43,7 +43,7 @@ static inline void x86_insw(uint16_t port, uint16_t *buf, uint32_t count_byte)
 
 static inline void x86_lgdt(void *addr)
 {
-    asm volatile (
+    __asm__ volatile (
         "lgdt [%0];"
         : /* No output */
         : "a"(addr)

@@ -69,7 +69,8 @@ void set_up_paging(MemoryRegion *mr) {
     PageDirectoryEntry tmp;
     tmp.pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT;
 
-    // setup PDE to kernel to load
+    // setup PDE for kernel to load
+    
     for(int i = 0; i < 4; ++i) {
         pde[0x200 + i] = tmp;
         paging_set_pde_4m_addr(pde + 0x200 + i, first4m + (4 << 20) * i,0);
@@ -87,9 +88,6 @@ void osloader_main(void)
     KernelBootArgs kba;
     memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
     set_up_paging(kba.mrs + kba.max_size_mr_index);
-    
-
-
     //kmain(kba);
 }
     
