@@ -6,6 +6,7 @@
 #include "libs/mem.h"
 #include "libs/uart.h"
 #include "libs/paging.h"
+#include "arch/x86/x86.h"
 
 /**
  * For OS loader 
@@ -18,7 +19,7 @@ typedef struct {
     uint32_t max_size_mr_index;
 }KernelBootArgs;
 
-void memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
+void osloader_memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
 {
     Mem_SMAP_Entry *smap = (void *)SMAP_ADDR + 4;
     int size = *(int *)(SMAP_ADDR);
@@ -53,17 +54,41 @@ void memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
     *pmrs = mrs;
 }
 
-void set_up_paging(MemoryRegion *mr) {
+void osloader_feature_check() {
+    //check PSE, page size extension
+    cpu_id_output tmp;
+    tmp.eax = 0;
+    x86_cpuid(&tmp);
+    char buf[13];
+    buf[sizeof(buf) - 1] = 0;
+    memcpy(buf, &(tmp.ebx), 4);
+    memcpy(buf + 4, &(tmp.ecx), 4);
+    memcpy(buf + 8, &(tmp.edx), 4);
+    LOG_INFO("cpuid.00h: eax : %x, manufacturer ID strings : %s", tmp.eax, buf);
+
+    tmp.eax = 1;
+    x86_cpuid(&tmp);
+    if(tmp.edx & (1 << 3)) {
+        LOG_INFO("cpuid.01h: PSE avaliable.");
+    }else {
+        LOG_INFO("cpuid.01h: eax : %x, ebx : %x, ecx : %x, edx : %x", tmp.eax, tmp.ebx, tmp.ecx, tmp.edx);
+        LOG_ERROR("cpuid.01h: PSE not avaliable");
+        while(1);
+    }
+}
+
+void osloader_set_up_paging(MemoryRegion *mr) {
     uint32_t first4m = (4 << 20) - (mr->base % (4 << 20)) + mr->base ;
     PageDirectoryEntry *pde = (PageDirectoryEntry*)(first4m + (16 << 20));
 
     memset((void*)pde, 0, 4 << 20);
     // setup pde points to pde
-    pde[0x3ff].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT;
-    paging_set_pde_4m_addr(pde + 0x3ff, (uint32_t)pde, 0);
+    //pde[0x3ff].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
+    //paging_set_pde_4m_addr(pde + 0x3ff, (uint32_t)pde, 0);
 
     // setup the first PDE
-    pde[0].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT;
+    pde[0].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
+    LOG_INFO("pde : %x", pde[0].pde);
     paging_set_pde_4m_addr(pde, 0x0, 0);
 
     PageDirectoryEntry tmp;
@@ -75,6 +100,21 @@ void set_up_paging(MemoryRegion *mr) {
         pde[0x200 + i] = tmp;
         paging_set_pde_4m_addr(pde + 0x200 + i, first4m + (4 << 20) * i,0);
     }
+
+    // enable CR4.PSE
+    uint32_t reg = x86_read_cr4();
+    X86_BTS(reg, CR4_PSE_BIT_OFFSET);
+    x86_write_cr4(reg);
+
+    // set CR3
+    reg = (uint32_t)pde | (1 << 3) | (1 << 4);
+    LOG_INFO("cr3 : %x", reg);
+    x86_write_cr3(reg);
+
+    // set CR0.PG
+    reg = x86_read_cr0();
+    X86_BTS(reg, CR0_PG_BIT_OFFSET);
+    x86_write_cr0(reg);
 }
 
 
@@ -86,8 +126,10 @@ void osloader_main(void)
     void (*kmain)(KernelBootArgs args);
     kmain = (void*)KERNEL_START;
     KernelBootArgs kba;
-    memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
-    set_up_paging(kba.mrs + kba.max_size_mr_index);
+    osloader_memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
+    osloader_feature_check();
+    osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
+
     //kmain(kba);
 }
     

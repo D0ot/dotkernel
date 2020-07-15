@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PAGING_PDE_P        (0 << 0)
+#define PAGING_PDE_P        (1 << 0)
 #define PAGING_PDE_RW       (1 << 1)
 #define PAGING_PDE_US       (1 << 2)
 #define PAGING_PDE_PWT      (1 << 3)

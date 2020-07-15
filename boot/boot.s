@@ -58,7 +58,7 @@ _text_start:
     ;call read_disk_realmode
 
     mov edi, OSLOADER_BASE
-    mov bl, 10
+    mov bl, 0x10
     mov dx, 0x1f0
     mov ebp, 1
     call pio28_read
