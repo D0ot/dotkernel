@@ -19,15 +19,23 @@ enum
         log_putchar('\n');                      \
     }while(0)
 
+
 #define LOG_DEBUG(...) LOG_LEVEL(LOG_LEVEL_DEBUG, __VA_ARGS__);
 #define LOG_INFO(...) LOG_LEVEL(LOG_LEVEL_INFO, __VA_ARGS__);
 #define LOG_WARNING(...) LOG_LEVEL(LOG_LEVEL_WARNING, __VA_ARGS__);
 #define LOG_ERROR(...) LOG_LEVEL(LOG_LEVEL_ERROR, __VA_ARGS__);
 
+#define LOG_ASSERT(x)                           \
+    do                                          \
+    {                                           \
+        if(!(x)) {                                \
+            LOG_ERROR("assert \"" #x "\" failed.");\
+        }                                       \
+    }while (0)
+    
 
 void log_putchar(char ch);
 void log(const char *format, ...);
 void log_level(int level, const char *format, ...);
-
 
 #endif 

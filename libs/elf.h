@@ -16,7 +16,7 @@ typedef struct {
     unsigned char       e_ident[EI_NIDENT];
     Elf32_Half          e_type;
     Elf32_Half          e_machine;
-    Elf32_Word          e_word;
+    Elf32_Word          e_version;
     Elf32_Addr          e_entry;
     Elf32_Off           e_phoff;
     Elf32_Off           e_shoff;

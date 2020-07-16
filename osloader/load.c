@@ -17,8 +17,10 @@
 typedef struct {
     MemoryRegion *mrs;
     uint32_t max_size_mr_index;
-    PageDirectoryEntry *pdes;
+    PageDirectoryEntry *phy_pdes;
 }KernelBootArgs;
+
+typedef void(*kernel_start_fun)(KernelBootArgs*);
 
 void osloader_memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
 {
@@ -115,26 +117,62 @@ PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
     X86_BTS(reg, CR0_PG_BIT_OFFSET);
     x86_write_cr0(reg);
 
-    // clear the core 16M space
-    memset((void*)(KERNEL_BASE), 0, (4 << 20) * 4);
     return pde;
 }
 
 
-void osloader_load_kernel() {
+kernel_start_fun osloader_load_kernel() {
+    uint8_t buf[512];
+    disk_read(KERNEL_SECTOR_BASE, 1, (uint16_t*)buf);
+
+    Elf32_Ehdr ehdr;
+    memcpy(&ehdr, buf, sizeof(ehdr));
+
+    // magic number check
+    LOG_ASSERT(ehdr.e_ident[EI_MAG0] == ELFMAG0);
+    LOG_ASSERT(ehdr.e_ident[EI_MAG1] == ELFMAG1);
+    LOG_ASSERT(ehdr.e_ident[EI_MAG2] == ELFMAG2);
+    LOG_ASSERT(ehdr.e_ident[EI_MAG3] == ELFMAG3);
+
     
+    LOG_ASSERT(ehdr.e_ident[EI_CLASS] == ELFCLASS32);
+    LOG_ASSERT(ehdr.e_ident[EI_DATA] == ELFDATA2LSB);
+    LOG_ASSERT(ehdr.e_ident[EI_VERSION] == EV_CURRENT);
+
+    LOG_ASSERT(ehdr.e_type == ET_EXEC);
+    LOG_ASSERT(ehdr.e_machine == EM_386);
+    LOG_ASSERT(ehdr.e_version == EV_CURRENT);
+    LOG_ASSERT(ehdr.e_ehsize == sizeof(ehdr));
+    
+    Elf32_Off phoff = ehdr.e_phoff;
+    uint32_t res, skip, length, sector_num;
+    skip = phoff / SECTOR_SIZE;
+    res = phoff % SECTOR_SIZE;
+    length = ehdr.e_phentsize * ehdr.e_phnum;
+    sector_num = length / SECTOR_SIZE;
+    if(sector_num > 256) {
+        sector_num = 0;
+        LOG_WARNING("sector_num > 256");
+    }
+
+    disk_read(KERNEL_SECTOR_BASE, sector_num, (uint16_t*)buf);
+}
+
+void osloader_move_stack(void *new_stack) {
+    x86_mov_stack(new_stack, (void*)BOOTLOADER_BASE);
 }
 
 void osloader_main(void)
 {
     LOG_INFO("osloader_main, enter");
     KernelBootArgs kba;
+    kernel_start_fun kmain;
     osloader_memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
     osloader_feature_check();
-    osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
-    osloader_load_kernel();
-    void (*kmain)(KernelBootArgs args);
-    kmain = (void*)KERNEL_START;
-    //kmain(kba);
+    kba.phy_pdes = osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
+    osloader_move_stack((void*)(4 << 20));
+    kmain = osloader_load_kernel();
+    LOG_INFO("osloader_main, leave, jmp to kmain");
+    kmain(&kba);
 }
     
