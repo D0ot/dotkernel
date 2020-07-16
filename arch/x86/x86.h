@@ -67,7 +67,11 @@ static inline void x86_cpuid(cpu_id_output*output) {
 #define X86_BTC(OP1, OP2) __asm__("btc %[op1], %[op2]" : [op1]"+m"(OP1) : [op2]"rN"(OP2) : "cc")
 
 static inline void x86_mov_stack(void *new_stack, void *old_stack) {
-    __asm__ (
+    __asm__ volatile(
+        "mov edi, %[new]\n\t"
+        "sub edi, 4\n\t"
+        "mov esi, %[old]\n\t"
+        "sub esi, 4\n\t"
         "mov eax, %[old]\n\t"
         "sub eax, esp\n\t"
         "mov ebx, %[new]\n\t"
@@ -82,10 +86,6 @@ static inline void x86_mov_stack(void *new_stack, void *old_stack) {
         ".%=equal:\n\t"
         "mov ecx, eax\n\t"
         "std\n\t"
-        "mov edi, %[new]\n\t"
-        "sub edi, 4\n\t"
-        "mov esi, %[old]\n\t"
-        "sub esi, 4\n\t"
         "rep movsd"
         : 
         : [new]"m"(new_stack), [old]"m"(old_stack)
