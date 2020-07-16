@@ -7,15 +7,3 @@ Here to learn Operating System.
 ### master 
 
 branch that works.
-
-### mbr-dev 
-
-mbr content, most of them are in `boot` directory
-
-### osloader-dev
-
-osloader content, most of them are in `osloader` directory
-
-### base-dev
-
-things like Makefile, things in `script` driectory

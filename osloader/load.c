@@ -17,6 +17,7 @@
 typedef struct {
     MemoryRegion *mrs;
     uint32_t max_size_mr_index;
+    PageDirectoryEntry *pdes;
 }KernelBootArgs;
 
 void osloader_memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
@@ -77,22 +78,21 @@ void osloader_feature_check() {
     }
 }
 
-void osloader_set_up_paging(MemoryRegion *mr) {
+PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
     uint32_t first4m = (4 << 20) - (mr->base % (4 << 20)) + mr->base ;
     PageDirectoryEntry *pde = (PageDirectoryEntry*)(first4m + (16 << 20));
 
     memset((void*)pde, 0, 4 << 20);
     // setup pde points to pde
-    //pde[0x3ff].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
-    //paging_set_pde_4m_addr(pde + 0x3ff, (uint32_t)pde, 0);
+    pde[0x3ff].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
+    paging_set_pde_4m_addr(pde + 0x3ff, (uint32_t)pde, 0);
 
     // setup the first PDE
     pde[0].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
-    LOG_INFO("pde : %x", pde[0].pde);
     paging_set_pde_4m_addr(pde, 0x0, 0);
 
     PageDirectoryEntry tmp;
-    tmp.pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT;
+    tmp.pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
 
     // setup PDE for kernel to load
     
@@ -108,28 +108,33 @@ void osloader_set_up_paging(MemoryRegion *mr) {
 
     // set CR3
     reg = (uint32_t)pde | (1 << 3) | (1 << 4);
-    LOG_INFO("cr3 : %x", reg);
     x86_write_cr3(reg);
 
     // set CR0.PG
     reg = x86_read_cr0();
     X86_BTS(reg, CR0_PG_BIT_OFFSET);
     x86_write_cr0(reg);
+
+    // clear the core 16M space
+    memset((void*)(KERNEL_BASE), 0, (4 << 20) * 4);
+    return pde;
 }
 
 
-
+void osloader_load_kernel() {
+    
+}
 
 void osloader_main(void)
 {
     LOG_INFO("osloader_main, enter");
-    void (*kmain)(KernelBootArgs args);
-    kmain = (void*)KERNEL_START;
     KernelBootArgs kba;
     osloader_memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
     osloader_feature_check();
     osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
-
+    osloader_load_kernel();
+    void (*kmain)(KernelBootArgs args);
+    kmain = (void*)KERNEL_START;
     //kmain(kba);
 }
     
