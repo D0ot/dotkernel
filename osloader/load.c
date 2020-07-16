@@ -121,8 +121,8 @@ PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
 }
 
 
-kernel_start_fun osloader_load_kernel() {
-    uint8_t buf[512];
+kernel_start_fun osloader_load_kernel(void *free_buf) {
+    uint8_t *buf = free_buf;
     disk_read(KERNEL_SECTOR_BASE, 1, (uint16_t*)buf);
 
     Elf32_Ehdr ehdr;
@@ -145,17 +145,42 @@ kernel_start_fun osloader_load_kernel() {
     LOG_ASSERT(ehdr.e_ehsize == sizeof(ehdr));
     
     Elf32_Off phoff = ehdr.e_phoff;
-    uint32_t res, skip, length, sector_num;
+    // skip, to skip 'skip' sectors
+    // res, offset from the first sector
+    // length, size in bytes
+    // sector_num, number of sectors to read
+    uint32_t res, skip, size, sector_num;
     skip = phoff / SECTOR_SIZE;
     res = phoff % SECTOR_SIZE;
-    length = ehdr.e_phentsize * ehdr.e_phnum;
-    sector_num = length / SECTOR_SIZE;
+    size = ehdr.e_phentsize * ehdr.e_phnum;
+    sector_num = size / SECTOR_SIZE + 1;
     if(sector_num > 256) {
         sector_num = 0;
         LOG_WARNING("sector_num > 256");
     }
 
-    disk_read(KERNEL_SECTOR_BASE, sector_num, (uint16_t*)buf);
+    // read program header
+    const uint32_t OSLOADER_PHDR_MAX_NUM = 16;
+    Elf32_Phdr phdr[OSLOADER_PHDR_MAX_NUM];
+    uint32_t phnum_max = ehdr.e_phnum > OSLOADER_PHDR_MAX_NUM ? OSLOADER_PHDR_MAX_NUM : ehdr.e_phnum;
+
+    disk_read(KERNEL_SECTOR_BASE + skip, sector_num, (uint16_t*)buf);
+    memcpy(phdr, buf + res, sizeof(Elf32_Phdr) * phnum_max);
+
+    for(uint32_t i = 0; i < phnum_max; ++i) {
+        LOG_ASSERT(size < (3 << 20));
+        // load loadable segment into memory
+        if(phdr[i].p_type == PT_LOAD) {
+            size = phdr[i].p_memsz;
+            skip = phdr[i].p_offset / SECTOR_SIZE;
+            res = phdr[i].p_offset % SECTOR_SIZE;
+            sector_num = size / SECTOR_SIZE + 1;
+            disk_read_ex(KERNEL_SECTOR_BASE + skip, sector_num, (uint16_t*)buf);
+            memcpy((void*)phdr[i].p_vaddr, buf + res, size);
+        }
+    }
+    LOG_INFO("kernel entry : %x", ehdr.e_entry);
+    return (kernel_start_fun)(ehdr.e_entry);
 }
 
 void osloader_move_stack(void *new_stack) {
@@ -170,9 +195,7 @@ void osloader_main(void)
     osloader_memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
     osloader_feature_check();
     kba.phy_pdes = osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
-    osloader_move_stack((void*)(4 << 20));
-    kmain = osloader_load_kernel();
+    kmain = osloader_load_kernel((void*)kba.mrs->base);
     LOG_INFO("osloader_main, leave, jmp to kmain");
     kmain(&kba);
 }
-    

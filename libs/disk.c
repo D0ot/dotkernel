@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include "disk.h"
 #include "arch/x86/x86.h"
+#include "defs/defs.h"
 
 /*
     \brief reading disk.
@@ -52,4 +53,20 @@ void disk_read(uint32_t sector_index, uint8_t count, uint16_t *buf)
         buf += 256;
     }
 
+}
+
+
+void disk_read_ex(uint32_t sector_index, uint32_t count, uint16_t *buf)
+{
+    uint32_t times = count / 0x100;
+    uint32_t res = count % 0x100;
+    uint8_t *tmp = (uint8_t*)buf;
+    for(uint32_t i = 0; i < times; ++i) {
+        disk_read(sector_index, 0, (uint16_t*)tmp);
+        sector_index += 0x100;
+        tmp += SECTOR_SIZE * 0x100;
+    }
+    if(res) {
+        disk_read(sector_index, res, (uint16_t*)tmp);
+    }
 }

@@ -28,6 +28,12 @@
 #define ATA_CMD_READ (0x20)
 
 
+// Basic Functions
 void disk_read(uint32_t sector_index, uint8_t count, uint16_t *buf);
 void disk_write(uint32_t sector_index, uint8_t count, uint16_t *buf); // not implemented
+
+
+// Advanced Functions
+
+void disk_read_ex(uint32_t sector_index, uint32_t count, uint16_t *buf);
 #endif

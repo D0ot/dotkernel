@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include "common.h"
+#include "arch/x86/x86.h"
 
 
 int sprintf(char *str, const char* format, ...)
@@ -239,15 +240,9 @@ void *memset(void *ptr, char value, uint32_t num)
     return ptr;
 }
 
-
 void *memcpy(void *dest, const void *src, size_t num)
 {
-    char *dest_iter = dest;
-    const char *src_iter = src;
-    for(size_t i = 0; i < num; ++i)
-    {
-        dest_iter[i] = src_iter[i];
-    }
+    x86_rep_movsb(dest, src, num);
     return dest;
 }
 

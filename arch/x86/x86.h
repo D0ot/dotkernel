@@ -67,7 +67,7 @@ static inline void x86_cpuid(cpu_id_output*output) {
 #define X86_BTC(OP1, OP2) __asm__("btc %[op1], %[op2]" : [op1]"+m"(OP1) : [op2]"rN"(OP2) : "cc")
 
 static inline void x86_mov_stack(void *new_stack, void *old_stack) {
-    __asm__ volatile(
+    __asm__ (
         "mov edi, %[new]\n\t"
         "sub edi, 4\n\t"
         "mov esi, %[old]\n\t"
@@ -93,6 +93,18 @@ static inline void x86_mov_stack(void *new_stack, void *old_stack) {
     );
 }
 
+static inline void x86_rep_movsb(void *dest, const void *src, uint32_t size) {
+    __asm__ (
+        "mov ecx, %[size]\n\t"
+        "mov edi, %[dest]\n\t"
+        "mov esi, %[src]\n\t"
+        "cld\n\t"
+        "rep movsb"
+        :
+        : [dest]"mr"(dest), [src]"mr"(src), [size]"mr"(size)
+        : "edi", "esi", "ecx", "memory", "cc"
+    );
+}
 
 #define CR0_PG_BIT_OFFSET (31)
 
