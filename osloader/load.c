@@ -7,6 +7,7 @@
 #include "libs/uart.h"
 #include "libs/paging.h"
 #include "arch/x86/x86.h"
+#include "osloader/load.h"
 
 /**
  * For OS loader 
@@ -14,13 +15,7 @@
  *      while will be loaded by start.s
  */
 
-typedef struct {
-    MemoryRegion *mrs;
-    uint32_t max_size_mr_index;
-    PageDirectoryEntry *phy_pdes;
-}KernelBootArgs;
-
-typedef void(*kernel_start_fun)(KernelBootArgs*);
+typedef void(*kernel_start_fun)();
 
 void osloader_memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
 {
@@ -81,10 +76,12 @@ void osloader_feature_check() {
 }
 
 PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
-    uint32_t first4m = (4 << 20) - (mr->base % (4 << 20)) + mr->base ;
-    PageDirectoryEntry *pde = (PageDirectoryEntry*)(first4m + (16 << 20));
+    uint32_t first4m = (4 << 20) - (mr->base % (4 << 20)) + mr->base;
+    PageDirectoryEntry *pde = (PageDirectoryEntry*)(first4m + (KERNEL_INITIAL_4MPAGE_NUM << 22));
 
+    // clear the full 4M page which stores PDE
     memset((void*)pde, 0, 4 << 20);
+
     // setup pde points to pde
     pde[0x3ff].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
     paging_set_pde_4m_addr(pde + 0x3ff, (uint32_t)pde, 0);
@@ -98,7 +95,7 @@ PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
 
     // setup PDE for kernel to load
     
-    for(int i = 0; i < 4; ++i) {
+    for(int i = 0; i < KERNEL_INITIAL_4MPAGE_NUM; ++i) {
         pde[0x200 + i] = tmp;
         paging_set_pde_4m_addr(pde + 0x200 + i, first4m + (4 << 20) * i,0);
     }
@@ -183,19 +180,22 @@ kernel_start_fun osloader_load_kernel(void *free_buf) {
     return (kernel_start_fun)(ehdr.e_entry);
 }
 
-void osloader_move_stack(void *new_stack) {
-    x86_mov_stack(new_stack, (void*)BOOTLOADER_BASE);
-}
-
+kernel_start_fun kmain;
 void osloader_main(void)
 {
     LOG_INFO("osloader_main, enter");
     KernelBootArgs kba;
-    kernel_start_fun kmain;
     osloader_memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
     osloader_feature_check();
     kba.phy_pdes = osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
     kmain = osloader_load_kernel((void*)kba.mrs->base);
     LOG_INFO("osloader_main, leave, jmp to kmain");
-    kmain(&kba);
+    memcpy((void*)(KERNEL_BOOT_ARGS_ADDR), (void*)&kba, sizeof(kba));
+    __asm__ (
+        "mov esp, %[new]\n\t"
+        "mov ebp, %[new]"
+        :
+        : [new] "i"(KERNEL_BASE + (KERNEL_INITIAL_4MPAGE_NUM << 22))
+    );
+    kmain();
 }

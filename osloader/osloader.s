@@ -1,5 +1,5 @@
-%include "../arch/x86/gdt_helper.s"
-%include "../defs/defs.s"
+%include "arch/x86/gdt_helper.s"
+%include "defs/defs.s"
 
 
 extern osloader_main

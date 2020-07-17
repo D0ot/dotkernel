@@ -1,5 +1,5 @@
-%include "../arch/x86/gdt_helper.s"
-%include "../defs/defs.s"
+%include "arch/x86/gdt_helper.s"
+%include "defs/defs.s"
 
 ; address
 
@@ -7,9 +7,8 @@
 ; memory map in mbr and osloader stage
 ; 0x0500 - 0x7bff   : stack
 ; 0x7c00 - 0x7dff   : bootloader, mbr
-; 0x7e00 - 0x7fff   : os loader 
+; 0x7e00 - 0xfdff   : os loader 
 
-; 0x80000 - 0xFFFFF ; unusable
 
 
 
@@ -58,7 +57,7 @@ _text_start:
     ;call read_disk_realmode
 
     mov edi, OSLOADER_BASE
-    mov bl, 0x20
+    mov bl, OSLOADER_SECTOR_NUM
     mov dx, 0x1f0
     mov ebp, 1
     call pio28_read
