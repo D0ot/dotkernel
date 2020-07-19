@@ -230,9 +230,9 @@ int strcmp(char *s1, char *s2)
     return *s1 - *s2;
 }
 
-void *memset(void *ptr, char value, uint32_t num)
+void *memset(void *ptr, uint8_t value, uint32_t num)
 {
-    char *iter = ptr;
+    uint8_t *iter = ptr;
     for(uint32_t i = 0; i < num; ++i)
     {
         iter[i] = value;
@@ -306,4 +306,26 @@ uint8_t strmatch(const char *s1, const char *s2,  uint32_t count)
         
     }
     return 1;
+}
+
+
+uint32_t nextntimes(uint32_t num, uint32_t n)
+{ 
+    return num + n - (num % n);
+}
+
+
+uint32_t max(uint32_t a, uint32_t b) {
+    if(a > b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+uint32_t min(uint32_t a, uint32_t b) {
+    if(a > b) {
+        return b;
+    } else {
+        return a;
+    }
 }

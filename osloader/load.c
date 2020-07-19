@@ -118,7 +118,7 @@ PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
 }
 
 
-kernel_start_fun osloader_load_kernel(void *free_buf) {
+void osloader_load_kernel(void *free_buf, kernel_start_fun *entry, void** next_free_addr) {
     uint8_t *buf = free_buf;
     disk_read(KERNEL_SECTOR_BASE, 1, (uint16_t*)buf);
 
@@ -164,6 +164,9 @@ kernel_start_fun osloader_load_kernel(void *free_buf) {
     disk_read(KERNEL_SECTOR_BASE + skip, sector_num, (uint16_t*)buf);
     memcpy(phdr, buf + res, sizeof(Elf32_Phdr) * phnum_max);
 
+
+    *(uint32_t*)next_free_addr = 0;
+
     for(uint32_t i = 0; i < phnum_max; ++i) {
         LOG_ASSERT(size < (3 << 20));
         // load loadable segment into memory
@@ -174,28 +177,25 @@ kernel_start_fun osloader_load_kernel(void *free_buf) {
             sector_num = size / SECTOR_SIZE + 1;
             disk_read_ex(KERNEL_SECTOR_BASE + skip, sector_num, (uint16_t*)buf);
             memcpy((void*)phdr[i].p_vaddr, buf + res, size);
+            if(*(uint32_t*)next_free_addr < phdr[i].p_vaddr + size) {
+                *(uint32_t*)next_free_addr = phdr[i].p_vaddr + size;
+            }
         }
     }
     LOG_INFO("kernel entry : %x", ehdr.e_entry);
-    return (kernel_start_fun)(ehdr.e_entry);
+    *entry = (kernel_start_fun)ehdr.e_entry;
 }
 
-kernel_start_fun kmain;
 void osloader_main(void)
 {
     LOG_INFO("osloader_main, enter");
     KernelBootArgs kba;
-    osloader_memory_pre_process(&(kba.mrs),&(kba.max_size_mr_index));
+    kernel_start_fun kentry;
+    osloader_memory_pre_process(&(kba.mrs),&(kba.mr_size));
     osloader_feature_check();
-    kba.phy_pdes = osloader_set_up_paging(kba.mrs + kba.max_size_mr_index);
-    kmain = osloader_load_kernel((void*)kba.mrs->base);
-    LOG_INFO("osloader_main, leave, jmp to kmain");
+    kba.pdes_paddr= osloader_set_up_paging(kba.mrs + kba.mr_size);
+    osloader_load_kernel((void*)kba.mrs->base, &kentry, &kba.next_free_vaddr);
+    LOG_INFO("osloader_main, leave, jmp to kentry");
     memcpy((void*)(KERNEL_BOOT_ARGS_ADDR), (void*)&kba, sizeof(kba));
-    __asm__ (
-        "mov esp, %[new]\n\t"
-        "mov ebp, %[new]"
-        :
-        : [new] "i"(KERNEL_BASE + (KERNEL_INITIAL_4MPAGE_NUM << 22))
-    );
-    kmain();
+    kentry();
 }

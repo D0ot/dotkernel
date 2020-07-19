@@ -15,7 +15,7 @@ int v_sprintf(char *str, const char* format, va_list ap);
 int v_printf(const char *format, va_list ap);
 int v_printf_callback(const char*format,out_func_ptr out_func, va_list ap);
 
-void *memset(void *ptr, char value, uint32_t num);
+void *memset(void *ptr, uint8_t value, uint32_t num);
 void *memcpy(void *dest, const void *src, size_t num);
 void *memmove(void *dest, const void *src, size_t num);
 char *strcpy(char *dest, const char *src);
@@ -43,5 +43,13 @@ uint8_t checksum(uint8_t *p, uint32_t count);
 // if not match, return 0
 uint8_t strmatch(const char *s1, const char *s2,  uint32_t count);
 
+
+// find the next number which is times of n
+uint32_t nextntimes(uint32_t num, uint32_t n);
+
+uint32_t max(uint32_t a, uint32_t b);
+uint32_t min(uint32_t a, uint32_t b);
+
+#define POWER_OF_2(X) ((1 << X))
 
 #endif 

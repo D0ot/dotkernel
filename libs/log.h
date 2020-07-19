@@ -32,6 +32,12 @@ enum
             LOG_ERROR("assert \"" #x "\" failed.");\
         }                                       \
     }while (0)
+
+#define LOG_VAR(x)                              \
+    do                                          \
+    {                                           \
+        LOG_INFO("%s = %x", #x, x);             \
+    }while(0)
     
 
 void log_putchar(char ch);
