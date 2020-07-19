@@ -2,15 +2,41 @@
 #include "libs/common.h"
 #include "libs/log.h"
 
-// size must be a multiple of (8 * ratio)
 
-void bitmap_init(BitMap *bm) {
+
+
+
+/**
+ * \fn void bitmap_init(BitMap *bm, void*managed, void*bitmap, uint32_t managed_size, uint32_t ratio);
+ * \brief Init the data structre to store then needed data
+ * \param bm bitmap data struture, to save the whole state.
+ * \param managed points to memory we want to manage.
+ * \param bitmap points to memory the bitmap itself usese.
+ * \param ratio one bit can present ratio * 8 byte.
+ */
+
+void bitmap_init(BitMap *bm, void*managed, void*bitmap, uint32_t managed_size, uint32_t ratio) {
+
+    bm->managed = managed;
+    bm->managed_size = managed_size;
+    bm->bitmap = bitmap;
+    bm->ratio = ratio;
+
     uint32_t bitmap_size = bm->managed_size / bm->ratio / 8;
-    LOG_VAR(bitmap_size);
     bm->bitmap_size = bitmap_size;
     memset(bm->bitmap, 0, bitmap_size);
 }
 
+/**
+ * \fn void* bitmap_alloc(BitMap *bm, uint32_t size) {
+ * \brief allocate a piece of memory.
+ * \param pm struct BitMap pointer.
+ * \param size size in byte
+ * \return the address of memroy allocated, 0 indicats no enough memory
+ * Allocate a piece of memroy, the real size(in byte) it occupies is "size" + 4 byte
+ * the additional 4 byte is to store the size(in bit). 
+ * if the address we get is ADDR, the size(in bit) will be "*(uint32_t*)(ADDR)"
+ */
 void* bitmap_alloc(BitMap *bm, uint32_t size) {
     uint32_t byte_size = size + sizeof(uint32_t);
     uint32_t bit_size = byte_size / bm->ratio;
@@ -19,9 +45,7 @@ void* bitmap_alloc(BitMap *bm, uint32_t size) {
     }
 
     uint8_t *ptr = bm->bitmap;
-    LOG_VAR(ptr);
     uint8_t *end = ptr + bm->bitmap_size;
-    LOG_VAR(end);
 
     uint32_t bit_cnt = 0;
     uint8_t *start = 0;
@@ -37,12 +61,12 @@ void* bitmap_alloc(BitMap *bm, uint32_t size) {
             } else {
                 bit_cnt = 0;
             }
-            LOG_VAR(bit_cnt);
             if(bit_cnt == bit_size) {
                 uint8_t *tmp = start;
                 uint32_t bit_cnt_down = bit_cnt;
-                uint32_t diff = 8 - start_i;
-                uint8_t s1 = diff <= bit_cnt_down ? 8 : start_i + bit_cnt_down;
+                uint8_t s1 = min(8, bit_cnt_down + start_i);
+
+
                 for(int j = start_i; j < s1; ++j) {
                     *tmp = *tmp | (1 << j);
                 }
@@ -71,15 +95,39 @@ void* bitmap_alloc(BitMap *bm, uint32_t size) {
     return NULL;
 
 }
+/**
+ * \fn void bitmap_free(BitMap *bm, void *addr);
+ * \brief free a piece of memroy
+ * \param pm BitMap struct pointer.
+ * \param addr the memroy you want to free.
+ *  it firstly dereference (addr - 4) to get size(in bit) of the memory
+ *  then clear the bits : [bit_offset, bit_offset + bit_size].
+ */
+
 void bitmap_free(BitMap *bm, void *addr) {
     uint32_t bit_size = *(uint32_t*)(addr - 4);
-    uint32_t bit_offset = (addr - bm->bitmap - 4) / bm->ratio;
+    uint32_t bit_offset = (addr - bm->managed - 4) / bm->ratio;
     
     uint32_t times = bit_offset / 8;
     uint32_t res = bit_offset % 8;
 
     uint8_t *ptr = bm->bitmap + times;
 
-    
-    
+    uint8_t s1 = min(8, bit_size + res);
+
+    for(int i = res; i < s1; ++i) {
+        *ptr = *ptr & (~(1 << i));
+    }
+    ++ptr;
+    bit_size -= (s1 - res);
+
+    uint32_t times2 = bit_size / 8;
+    uint32_t res2 = bit_size % 8;
+
+    memset(ptr, 0, times2);
+    ptr += times2;
+
+    for(int i = 0; i < res2; ++i) {
+        *ptr = * ptr & (~(1 << i));
+    }
 }

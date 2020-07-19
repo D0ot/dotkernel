@@ -13,7 +13,7 @@ typedef struct{
 } BitMap;
 
 
-void bitmap_init(BitMap *bm);
+void bitmap_init(BitMap *bm, void*managed, void*bitmap, uint32_t managed_size, uint32_t ratio);
 void* bitmap_alloc(BitMap *bm, uint32_t size);
 void bitmap_free(BitMap *bm, void *addr);
 
