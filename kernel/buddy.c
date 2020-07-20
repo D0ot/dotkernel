@@ -3,7 +3,14 @@
 #include "libs/utils.h"
 #include "libs/log.h"
 
-
+/**
+ * \fn void buddy_init(BuddySystem *bs, void*managed, uint32_t managed_size, void*buddy_system);
+ * \brief initialize the BuddySystem data structure.
+ * \param bs buddy system internal data.
+ * \param managed pointer to memory we want to manage.
+ * \param managed_size the size of memory we want managed.
+ * \param buddy_system the memory that buddy system itself usese.
+ */
 
 void buddy_init(BuddySystem *bs, void*managed, uint32_t managed_size, void*buddy_system) {
     bs->managed = managed;
@@ -28,6 +35,14 @@ void buddy_init(BuddySystem *bs, void*managed, uint32_t managed_size, void*buddy
     }
 }
 
+/**
+ * \fn void *buddy_alloc(BuddySystem *bs, uint32_t page_num)
+ * \brief alloc a block of memory, size is "page_num"(in page).
+ * \param bs buddy system internal data.
+ * \param page_num the number of page we want to alloc
+ *  a wise choice is that the "page_num" is a power of 2,
+ *  otherwise the memroy will be wasted.
+ */
 
 void *buddy_alloc(BuddySystem *bs, uint32_t page_num) {
     uint8_t pow = buddy_aux_fit(page_num);
@@ -40,6 +55,12 @@ void *buddy_alloc(BuddySystem *bs, uint32_t page_num) {
     return buddy_pageindex2addr(bs, ret);
 }
 
+/**
+ * \fn void buddy_free(BuddySystem *bs, void *addr)
+ * \brief free a block of memory.
+ * \param bs buddy system internal data.
+ * \param addr the address of the memory block to be freed.
+ */
 
 void buddy_free(BuddySystem *bs, void *addr) {
     int32_t index = buddy_addr2pageindex(bs, addr);

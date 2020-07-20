@@ -33,7 +33,6 @@ int strcmp(char *s1, char *s2);
 void *memcpy(void *dest, const void *src, size_t num);
 void *memmove(void *dest, const void *src, size_t num);
 size_t strlen(const char* str);
-int abs(int value);
 #endif 
 
 #endif

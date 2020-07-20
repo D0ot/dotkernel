@@ -106,12 +106,6 @@ int sprintf(char *str, const char* format, ...)
 
 
 
-// inline function to swap two numbers
-
-int abs(int value)
-{
-    return value > 0 ? value : -value;
-}
 
 
 

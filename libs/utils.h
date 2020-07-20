@@ -23,6 +23,8 @@ uint32_t min(uint32_t a, uint32_t b);
 char *itoa(int value, char *str, int base);
 char *utoa(unsigned value, char *str, unsigned base);
 void swap(char *x, char *y);
+int abs(int value);
+
 #define POWER_OF_2(X) ((1 << (X)))
 
 #endif

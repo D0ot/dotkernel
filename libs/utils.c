@@ -128,3 +128,9 @@ char *utoa(unsigned value, char* buffer, unsigned base)
 void swap(char *x, char *y) {
 	char t = *x; *x = *y; *y = t;
 }
+
+
+int abs(int value)
+{
+    return value > 0 ? value : -value;
+}

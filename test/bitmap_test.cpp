@@ -1,4 +1,5 @@
 #include <iostream>
+#include "gtest/gtest.h"
 
 extern "C" {
 #include "../libs/log.h"
@@ -8,5 +9,9 @@ extern "C" {
 }
 
 
-int main(void) {
+TEST(test1, test1_1) {
+    ASSERT_EQ(1, 1);
 }
+
+
+
