@@ -2,7 +2,7 @@ include ../configs/config.mk
 
 .PHONY : all 
 
-objs = main.o ../libs/log.o ../libs/common.o ../libs/uart.o bitmap.o
+objs = main.o ../libs/log.o ../libs/common.o ../libs/uart.o bitmap.o buddy.o
 
 asm_objs = start.o
 

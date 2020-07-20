@@ -80,7 +80,7 @@ void* bitmap_alloc(BitMap *bm, uint32_t size) {
                 }
                 uint32_t res = bit_cnt_down % 8;
 
-                for(int j = 0; j < res; ++j) {
+                for(uint32_t j = 0; j < res; ++j) {
                     *tmp = *tmp | (1 << j);
                 }
 
@@ -127,7 +127,7 @@ void bitmap_free(BitMap *bm, void *addr) {
     memset(ptr, 0, times2);
     ptr += times2;
 
-    for(int i = 0; i < res2; ++i) {
+    for(uint32_t i = 0; i < res2; ++i) {
         *ptr = * ptr & (~(1 << i));
     }
 }
