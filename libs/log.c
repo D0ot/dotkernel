@@ -1,23 +1,23 @@
 #include "libs/log.h"
-#include "libs/common.h"
+#include "libs/kustd.h"
 #include "libs/uart.h"
 #include <stdarg.h>
 
 
-void log_putchar(char ch)
+void klog_putchar(char ch)
 {
     uart_putchar(ch);
 }
 
-void log(const char *format, ...)
+void klog(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    v_printf_callback(format, log_putchar, ap);
+    v_printf_callback(format, klog_putchar, ap);
     va_end(ap);
 }
 
-void log_level(int level, const char *format, ...)
+void klog_level(int level, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -32,14 +32,14 @@ void log_level(int level, const char *format, ...)
     char *output = level_str[level];
     while(*output)
     {
-        log_putchar(*output++);
+        klog_putchar(*output++);
     }
     output = " | ";
     while (*output)
     {
-        log_putchar(*output++);
+        klog_putchar(*output++);
     }
     
-    v_printf_callback(format, log_putchar, ap);
+    v_printf_callback(format, klog_putchar, ap);
     va_end(ap);
 }

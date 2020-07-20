@@ -14,9 +14,9 @@ enum
 #define LOG_LEVEL(...)                          \
     do                                          \
     {                                           \
-        log("%s:%d | ", __FILE__, __LINE__);    \
-        log_level(__VA_ARGS__);                 \
-        log_putchar('\n');                      \
+        klog("%s:%d | ", __FILE__, __LINE__);    \
+        klog_level(__VA_ARGS__);                 \
+        klog_putchar('\n');                      \
     }while(0)
 
 
@@ -40,8 +40,8 @@ enum
     }while(0)
     
 
-void log_putchar(char ch);
-void log(const char *format, ...);
-void log_level(int level, const char *format, ...);
+void klog_putchar(char ch);
+void klog(const char *format, ...);
+void klog_level(int level, const char *format, ...);
 
 #endif 

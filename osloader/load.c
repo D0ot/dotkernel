@@ -1,5 +1,5 @@
 #include "defs/defs.h"
-#include "libs/common.h"
+#include "libs/kustd.h"
 #include "libs/disk.h"
 #include "libs/elf.h"
 #include "libs/log.h"

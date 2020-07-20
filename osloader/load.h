@@ -1,5 +1,5 @@
-#ifndef LOAD_H_
-#define LOAD_H_
+#ifndef _LOAD_H_
+#define _LOAD_H_
 
 #include <stdint.h>
 #include "libs/mem.h"

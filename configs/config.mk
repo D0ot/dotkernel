@@ -13,7 +13,9 @@ OBJCOPY = ${TOOLS_PREIFX}objcopy
 AS_ELF_FLAGS = -f elf32 -F dwarf -g -i${project_path}
 AS_BIN_FLAGS = -f bin
 LINK_FLAGS = -nostdlib -g
-CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall -Wextra -Wno-address-of-packed-member -g -O0 -I${project_path}
+CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall  \
+	-Wextra -Wno-address-of-packed-member -g -O0 -I${project_path} \
+	-DDOT_KERNEL
 
 OBJCOPY_GENBIN_FLAGS = -O binary -S
 OBJCOPY_GENSYM_FLAGS = --only-keep-debug

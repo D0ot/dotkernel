@@ -1,5 +1,5 @@
-#ifndef BUDDY_H_
-#define BUDDY_H_
+#ifndef _BUDDY_H_
+#define _BUDDY_H_
 
 #include <stddef.h>
 #include <stdint.h>

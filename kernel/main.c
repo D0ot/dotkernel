@@ -4,7 +4,7 @@
 #include "osloader/load.h"
 #include "libs/log.h"
 #include "defs/defs.h"
-#include "libs/common.h"
+#include "libs/kustd.h"
 #include "bitmap.h"
 #include "buddy.h"
 

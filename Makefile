@@ -4,7 +4,7 @@ export
 
 include configs/config.mk
 
-.PHONY : all clean debug
+.PHONY : all clean debug test testconf
 
 all : config
 	cd boot && make 
@@ -22,6 +22,12 @@ all : config
 reall : 
 	make clean
 	make all
+
+test :
+	cd test/build && make
+
+testconf :
+	cd test && mkdir -p build && cd build && cmake .. -DPROJECT_PATH=${project_path}
 
 config : defs/defs.conf
 	python3 scripts/mkdefs.py defs/defs.conf defs/defs.s defs/defs.h

@@ -1,5 +1,6 @@
 #include "bitmap.h"
-#include "libs/common.h"
+#include "libs/kustd.h"
+#include "libs/utils.h"
 #include "libs/log.h"
 
 
@@ -65,7 +66,6 @@ void* bitmap_alloc(BitMap *bm, uint32_t size) {
                 uint8_t *tmp = start;
                 uint32_t bit_cnt_down = bit_cnt;
                 uint8_t s1 = min(8, bit_cnt_down + start_i);
-
 
                 for(int j = start_i; j < s1; ++j) {
                     *tmp = *tmp | (1 << j);

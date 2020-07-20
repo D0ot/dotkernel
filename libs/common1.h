@@ -20,30 +20,23 @@ void *memcpy(void *dest, const void *src, size_t num);
 void *memmove(void *dest, const void *src, size_t num);
 char *strcpy(char *dest, const char *src);
 
-
-
 int strcmp(char *s1, char *s2);
 size_t strlen(const char* str);
 
 int abs(int value);
 void swap(char *x, char *y);
-char* reverse(char *buffer, size_t i, size_t j);
 char *itoa(int value, char *str, int base);
 char *utoa(unsigned value, char *str, unsigned base);
 
 
-uint32_t powerof2(uint8_t p);
-uint32_t poweru32(uint32_t b, uint32_t p);
-
-// my own lib function
-uint8_t checksum(uint8_t *p, uint32_t count);
 
 
 // if match, return 1
 // if not match, return 0
 uint8_t strmatch(const char *s1, const char *s2,  uint32_t count);
 
-
+char* reverse(char *buffer, size_t i, size_t j);
+uint8_t checksum(uint8_t *p, uint32_t count);
 // find the next number which is times of n
 uint32_t nextntimes(uint32_t num, uint32_t n);
 
