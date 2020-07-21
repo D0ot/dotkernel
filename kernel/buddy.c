@@ -12,7 +12,7 @@
  * \param buddy_system the memory that buddy system itself usese.
  */
 
-void buddy_init(BuddySystem *bs, void*managed, uint32_t managed_size, void*buddy_system) {
+void buddy_init(BuddySystem *bs, void *managed, uint32_t managed_size, void *buddy_system) {
     bs->managed = managed;
     bs->managed_size = managed_size;
     bs->buddy_system = buddy_system;
@@ -77,6 +77,9 @@ int32_t buddy_aux_alloc(BuddySystem *bs, uint8_t pow) {
         return ret;
     } else {
         int32_t half1 = buddy_aux_alloc(bs, pow + 1);
+        if(half1 == -1) {
+            return -1;
+        }
         int32_t half2 = half1 + POWER_OF_2(bs->buddy_system[half1].pow - 1);
         bs->buddy_system[half1].pow = pow;
         bs->buddy_system[half2].next = -1;
@@ -88,6 +91,7 @@ int32_t buddy_aux_alloc(BuddySystem *bs, uint8_t pow) {
 
 void buddy_aux_free(BuddySystem *bs, int32_t page_index) {
     uint8_t pow = bs->buddy_system[page_index].pow;
+    LOG_INFO("pow : %x", (uint32_t)pow);
     int32_t last = -1;
     int32_t i = bs->indices[pow];
     if(i == -1) { 
@@ -170,11 +174,14 @@ uint8_t buddy_aux_mergable(int32_t page_index1, int32_t page_index2, uint8_t pow
 
 void buddy_debug_print(BuddySystem *bs) {
     
+    LOG_INFO("buddy_debug_print :");
     for(int i = 0; i < 19; ++i) {
         int32_t iter = bs->indices[i];
-        LOG_INFO("block page num : %x", POWER_OF_2(i));
+        if(iter != -1) {
+            LOG_INFO("block size (in pages) : 2^%x", i);
+        }
         while(iter != -1) {
-            LOG_INFO("\t block index %x", iter);
+            LOG_INFO("\tindex %x", iter);
             iter = bs->buddy_system[iter].next;
         }
     }

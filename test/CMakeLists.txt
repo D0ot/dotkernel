@@ -41,6 +41,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-add_executable(dotkernel_test bitmap_test.cpp ../libs/log.c ../libs/kustd.c ../libs/utils.c)
-target_compile_options(dotkernel_test PUBLIC -I${PROJECT_PATH})
+add_executable(dotkernel_test buddy_test.cpp ../libs/log.c ../libs/kustd.c 
+  ../libs/utils.c ../kernel/buddy.c)
+target_compile_options(dotkernel_test PUBLIC -I${PROJECT_PATH} -g)
 target_link_libraries(dotkernel_test gtest_main)

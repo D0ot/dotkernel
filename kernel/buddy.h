@@ -18,7 +18,6 @@ typedef struct {
     BuddyList *buddy_system;
     uint32_t buddy_system_size;
     int32_t indices[20];
-    uint32_t current_max_index;
 } BuddySystem;
 
 /**
