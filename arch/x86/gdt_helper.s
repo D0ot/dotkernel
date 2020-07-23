@@ -2,9 +2,15 @@
 
 
 ; constants used as rhs operands of "<<" operator
-DESC_BASE_OFFSET1       equ         16          ; length 16
-DESC_BASE_OFFSET2       equ         0           ; length 8
-DESC_BASE_OFFSET3       equ         24          ; length 8
+DESC_LIMIT_16_19       equ         16          ; length 16
+; limit 19:16
+
+DESC_BASE_16_23       equ         0           ; length 8
+; base 23:16
+
+DESC_BASE_24_31       equ         24          ; length 8
+; base 31:24
+
 DESC_AVL_OFFSET         equ         20
 
 

@@ -17,10 +17,11 @@
 
 typedef void(*kernel_start_fun)();
 
-void osloader_memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
+void osloader_memory_pre_process(MemoryRegion **pmrs, uint32_t *max_index, uint32_t *max_length_index)
 {
     Mem_SMAP_Entry *smap = (void *)SMAP_ADDR + 4;
     int size = *(int *)(SMAP_ADDR);
+    *max_index = size;
     MemoryRegion * mrs = (void*)(smap) + size * SMAP_ENTRY_SIZE;
     LOG_INFO("Total memory info");
     int cnt = 0;
@@ -48,7 +49,7 @@ void osloader_memory_pre_process(MemoryRegion ** pmrs, uint32_t* max_index)
         }
     }
     LOG_INFO("Max-size usuable memroy region, %x, %x",mrs[maxsize_index].base, mrs[maxsize_index].length);
-    *max_index = maxsize_index;
+    *max_length_index = maxsize_index;
     *pmrs = mrs;
 }
 
@@ -191,10 +192,12 @@ void osloader_main(void)
     LOG_INFO("osloader_main, enter");
     KernelBootArgs kba;
     kernel_start_fun kentry;
-    osloader_memory_pre_process(&(kba.mrs),&(kba.mr_size));
+    osloader_memory_pre_process(&(kba.mrs), &(kba.mr_size), &(kba.mr_max_length_index));
     osloader_feature_check();
     kba.pdes_paddr= osloader_set_up_paging(kba.mrs + kba.mr_size);
     osloader_load_kernel((void*)kba.mrs->base, &kentry, &kba.next_free_vaddr);
+    // 16MiB for loading kernel, 4M for PDEs(currently 4KiB is used)
+    kba.next_free_paddr = (void*)(kba.mrs[kba.mr_max_length_index].base + (4 << 20) * 5);
     LOG_INFO("osloader_main, leave, jmp to kentry");
     memcpy((void*)(KERNEL_BOOT_ARGS_ADDR), (void*)&kba, sizeof(kba));
     kentry();

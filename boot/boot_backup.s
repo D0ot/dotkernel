@@ -150,24 +150,24 @@ GDT_BASE            dd      0x0
                     dd      0x0
 
 CODE_DESC           dd      0x0000ffff
-                    dd      (0 << DESC_BASE_OFFSET2)+ \
+                    dd      (0 << DESC_BASE_16_23)+ \
                             DESC_TYPE_CODE_EX + \
                             DESC_S_USR + \
                             DESC_DPL_0 + \
                             DESC_P_SET + \
                             DESC_L_CLS + \
                             DESC_G_4K + \
-                            (0 << DESC_BASE_OFFSET3)
+                            (0 << DESC_BASE_24_31)
 
 DATA_DESC           dd      0x0000ffff
-                    dd      (0 << DESC_BASE_OFFSET2)+ \
+                    dd      (0 << DESC_BASE_16_23)+ \
                             DESC_TYPE_DATA_RDWR + \
                             DESC_S_USR + \
                             DESC_DPL_0 + \
                             DESC_P_SET + \
                             DESC_L_CLS + \
                             DESC_G_4K + \
-                            (0 << DESC_BASE_OFFSET3)
+                            (0 << DESC_BASE_24_31)
 
 GDT_SIZE            equ     $ - GDT_BASE
 GDT_LIMIT           equ      GDT_SIZE - 1

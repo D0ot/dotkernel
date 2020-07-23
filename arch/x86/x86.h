@@ -163,4 +163,12 @@ static inline void x86_write_cr4(uint32_t in) {
     );
 }
 
+static inline void x86_invlpg(void *addr) {
+    __asm__ (
+        "invlpg [%[addr]]"
+        :
+        : [addr] "Q" (addr)
+    );
+}
+
 #endif

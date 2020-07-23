@@ -41,7 +41,7 @@ void buddy_init(BuddySystem *bs, void *managed, uint32_t managed_size, void *bud
  * \param bs buddy system internal data.
  * \param page_num the number of page we want to alloc
  *  a wise choice is that the "page_num" is a power of 2,
- *  otherwise the memroy will be wasted.
+ *  otherwise the memory will be wasted.
  */
 
 void *buddy_alloc(BuddySystem *bs, uint32_t page_num) {
@@ -66,6 +66,18 @@ void buddy_free(BuddySystem *bs, void *addr) {
     int32_t index = buddy_addr2pageindex(bs, addr);
     buddy_aux_free(bs, index);
 }
+
+/**
+ * \fn uint32_t buddy_get_memreq(uint32_t managed_size)
+ * \brief get the memory needed for buddy system, 
+ * \param managed_size the size of managed memory
+ */
+
+uint32_t buddy_get_memreq(uint32_t managed_size) {
+    return managed_size / PAGE_SIZE * sizeof(BuddyList);
+}
+
+
 
 int32_t buddy_aux_alloc(BuddySystem *bs, uint8_t pow) {
     if(pow == 20) {
