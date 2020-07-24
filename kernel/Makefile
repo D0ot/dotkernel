@@ -4,7 +4,7 @@ include ../configs/config.mk
 
 objs = main.o ../libs/log.o ../libs/kustd.o ../libs/uart.o ../libs/utils.o bitmap.o buddy.o
 
-asm_objs = start.o
+asm_objs = start.o ../arch/x86/interrupt.o
 
 all : kernel.elf kernel.debug
 
