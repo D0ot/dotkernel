@@ -19,13 +19,31 @@ typedef struct {
     uint16_t offset_16_31;
 } InterruptDescriptorEntry;
 
-extern InterruptDescriptorEntry x86_idt[256];
+typedef void(*x86_irq_common_handle_ptr)(
+    uint32_t irq_num,
 
-extern uint16_t x86_idt_limit;
-extern InterruptDescriptorEntry* x86_idt_ptr;
+    uint32_t edi,
+    uint32_t esi,
+    uint32_t ebp,
+    uint32_t orginal_esp,
+    uint32_t ebx,
+    uint32_t edx,
+    uint32_t ecx,
+    uint32_t eax,
 
-void x86_init_all_desc();
-void x86_assign_handler(uint8_t n, uint32_t offset, uint16_t selector);
-void x86_lidt();
+    uint32_t error_code,
+    uint32_t eip,
+    uint32_t cs,
+    uint32_t eflags
+);
+
+
+
+
+void x86_int_init_all_desc();
+void x86_int_assign_handler(uint8_t n, uint32_t offset, uint16_t selector);
+void x86_int_set_common_handle(x86_irq_common_handle_ptr common_handle);
+void x86_int_lidt();
+
 
 #endif
