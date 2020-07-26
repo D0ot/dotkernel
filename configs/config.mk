@@ -10,7 +10,7 @@ LD = ${TOOLS_PREIFX}ld
 AS = nasm 
 OBJCOPY = ${TOOLS_PREIFX}objcopy
 
-AS_ELF_FLAGS = -f elf32 -F dwarf -g -i${project_path}
+AS_ELF_FLAGS = -f elf32 -g -F dwarf -i${project_path}
 AS_BIN_FLAGS = -f bin
 LINK_FLAGS = -nostdlib -g
 CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall  \
@@ -20,4 +20,8 @@ CC_FLAGS = -std=gnu11 -ffreestanding -m32 -masm=intel -Wall  \
 OBJCOPY_GENBIN_FLAGS = -O binary -S
 OBJCOPY_GENSYM_FLAGS = --only-keep-debug
 
-CLEAN_CMD = find . | grep -e  "\.o" -e "\.elf" -e "\.bin" -e "\.debug" | xargs rm -f
+OBJDUMP = ${TOOLS_PREFIX}objdump
+
+OBJDUMP_GENDIS_FLAGS = -d -M intel 
+
+CLEAN_CMD = find . | grep -e "\.dis" -e "\.o" -e "\.elf" -e "\.bin" -e "\.debug" | xargs rm -f

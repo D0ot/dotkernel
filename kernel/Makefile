@@ -8,12 +8,14 @@ objs = \
 	../libs/uart.o \
 	../libs/utils.o \
 	../arch/x86/interrupt.o \
+	../arch/x86/pic8259a.o \
+	../arch/x86/pit8254.o \
 	bitmap.o buddy.o main.o
 
 
 asm_objs = start.o ../arch/x86/interrupt_asm.o 
 
-all : kernel.elf kernel.debug
+all : kernel.elf kernel.debug kernel.dis
 
 CC_FLAGS_INT = -mno-red-zone -mgeneral-regs-only
 
@@ -24,6 +26,9 @@ kernel.elf : ${objs} ${asm_objs} int_handle.o kernel.ld
 kernel.debug : kernel.elf
 	${OBJCOPY} ${OBJCOPY_GENSYM_FLAGS} $< $@
 	cp $@ ../debug/
+
+kernel.dis : kernel.elf
+	${OBJDUMP} ${OBJDUMP_GENDIS_FLAGS} $< > $@
 
 ${objs} : %.o : %.c %.h
 	${CC} -c $< -o $@ ${CC_FLAGS}

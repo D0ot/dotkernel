@@ -18,16 +18,20 @@ x86_irq_common_handle       dd          0
 %define HAS_ERROR_CODE      nop
 
 
+section .text
 ; first is irq number, second is push 0 or not(when has error_code in stack)
 %macro X86_IRQ_HANDLE 2
-section .text
 global x86_irq%1_handle
 x86_irq%1_handle:
+    cli
     %2
     pushad
     push %1
     call [x86_irq_common_handle]
+    add esp, 4
     popad
+    add esp, 4
+    sti
     iret
 %endmacro 
 

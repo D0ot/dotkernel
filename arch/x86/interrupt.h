@@ -17,11 +17,15 @@ typedef struct {
     uint8_t zero;
     uint8_t type;
     uint16_t offset_16_31;
-} InterruptDescriptorEntry;
+} __attribute__((packed)) InterruptDescriptorEntry;
+
+
+#define X86_IRQ_PUSHA
 
 typedef void(*x86_irq_common_handle_ptr)(
     uint32_t irq_num,
 
+#ifdef X86_IRQ_PUSHA
     uint32_t edi,
     uint32_t esi,
     uint32_t ebp,
@@ -30,6 +34,7 @@ typedef void(*x86_irq_common_handle_ptr)(
     uint32_t edx,
     uint32_t ecx,
     uint32_t eax,
+#endif
 
     uint32_t error_code,
     uint32_t eip,

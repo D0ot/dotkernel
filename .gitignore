@@ -6,4 +6,5 @@ build/*
 *.elf
 *.o
 *.log
+*.dis
 test/build/*
