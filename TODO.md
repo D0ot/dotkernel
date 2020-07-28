@@ -1,3 +1,4 @@
 # TODO List
 
-1. interrupt configurations.
+1. memory management system.
+2. make it multi-threading.
