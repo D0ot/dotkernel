@@ -76,11 +76,11 @@ void osloader_feature_check() {
     }
 }
 
-PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
+pde_t* osloader_set_up_paging(MemoryRegion *mr) {
     uint32_t first4m = (4 << 20) - (mr->base % (4 << 20)) + mr->base;
-    PageDirectoryEntry *pde = (PageDirectoryEntry*)(first4m + (KERNEL_INITIAL_4MPAGE_NUM << 22));
+    pde_t *pde = (pde_t*)(first4m + (KERNEL_INITIAL_4MPAGE_NUM << 22) + (4 << 20) - (4 << 10));
 
-    // clear the full 4M page which stores PDE
+    // clear the pdes
     memset((void*)pde, 0, 4 << 20);
 
     // setup pde points to pde
@@ -91,7 +91,7 @@ PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
     pde[0].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
     paging_set_pde_4m_addr(pde, 0x0, 0);
 
-    PageDirectoryEntry tmp;
+    pde_t tmp;
     tmp.pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
 
     // setup PDE for kernel to load
@@ -115,7 +115,7 @@ PageDirectoryEntry* osloader_set_up_paging(MemoryRegion *mr) {
     X86_BTS(reg, CR0_PG_BIT_OFFSET);
     x86_write_cr0(reg);
 
-    return pde;
+    return 0xffffffff - ((4 << 20) - 1);
 }
 
 
@@ -194,9 +194,9 @@ void osloader_main(void)
     kernel_start_fun kentry;
     osloader_memory_pre_process(&(kba.mrs), &(kba.mr_size), &(kba.mr_max_length_index));
     osloader_feature_check();
-    kba.pdes_paddr= osloader_set_up_paging(kba.mrs + kba.mr_size);
+    kba.pde_vaddr = osloader_set_up_paging(kba.mrs + kba.mr_size);
     osloader_load_kernel((void*)kba.mrs->base, &kentry, &kba.next_free_vaddr);
-    // 16MiB for loading kernel, 4M for PDEs(currently 4KiB is used)
+    // 16MiB for loading kernel, 4Mib for PDEs(currently the last 4KiB is used)
     kba.next_free_paddr = (void*)(kba.mrs[kba.mr_max_length_index].base + (4 << 20) * 5);
     LOG_INFO("osloader_main, leave, jmp to kentry");
     memcpy((void*)(KERNEL_BOOT_ARGS_ADDR), (void*)&kba, sizeof(kba));

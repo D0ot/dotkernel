@@ -9,7 +9,7 @@ typedef struct {
     MemoryRegion *mrs;
     uint32_t mr_size;
     uint32_t mr_max_length_index;
-    PageDirectoryEntry *pdes_paddr;
+    pde_t *pde_vaddr;
     void *next_free_vaddr;
     void *next_free_paddr;
 } KernelBootArgs;

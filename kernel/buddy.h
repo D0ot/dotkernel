@@ -31,7 +31,7 @@ typedef struct {
 
 void buddy_init(BuddySystem *bs, void*managed, uint32_t managed_size, void*buddy_system);
 void *buddy_alloc(BuddySystem *bs, uint32_t page_num);
-void buddy_free(BuddySystem *bs, void *addr);
+uint32_t buddy_free(BuddySystem *bs, void *addr);
 uint32_t buddy_get_memreq(uint32_t managed_size);
 
 

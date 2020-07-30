@@ -28,12 +28,31 @@ typedef struct {
         };
         uint32_t pde;
     };
-} __attribute__((packed)) PageDirectoryEntry;
+} __attribute__((packed)) pde_t;
 
 
+typedef struct {
+    union {
+        struct {
+            uint8_t p : 1;
+            uint8_t rw : 1;
+            uint8_t us : 1;
+            uint8_t pwt : 1;
+            uint8_t pcd : 1;
+            uint8_t a : 1;
+            uint8_t d : 1;
+            uint8_t pat : 1;
+            uint8_t g : 1;
+            uint8_t _padding : 3;
+            uint32_t addr : 20;
+        };
 
-void paging_set_pde_table_addr(PageDirectoryEntry* pde, uint32_t addr);
-void paging_set_pde_4m_addr(PageDirectoryEntry* pde, uint32_t addr, uint8_t pat);
+        uint32_t pte;
+    };
+} __attribute__((packed)) pte_t;
+
+void paging_set_pde_table_addr(pde_t* pde, uint32_t addr);
+void paging_set_pde_4m_addr(pde_t* pde, uint32_t addr, uint8_t pat);
 
 
 

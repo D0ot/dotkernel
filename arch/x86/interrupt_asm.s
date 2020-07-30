@@ -23,7 +23,6 @@ section .text
 %macro X86_IRQ_HANDLE 2
 global x86_irq%1_handle
 x86_irq%1_handle:
-    cli
     %2
     pushad
     push %1
@@ -31,7 +30,6 @@ x86_irq%1_handle:
     add esp, 4
     popad
     add esp, 4
-    sti
     iret
 %endmacro 
 

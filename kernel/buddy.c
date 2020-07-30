@@ -60,11 +60,14 @@ void *buddy_alloc(BuddySystem *bs, uint32_t page_num) {
  * \brief free a block of memory.
  * \param bs buddy system internal data.
  * \param addr the address of the memory block to be freed.
+ * \return the page num of the block to be freed
  */
 
-void buddy_free(BuddySystem *bs, void *addr) {
+uint32_t buddy_free(BuddySystem *bs, void *addr) {
     int32_t index = buddy_addr2pageindex(bs, addr);
+    uint32_t ret = POWER_OF_2(bs->buddy_system[index].pow);
     buddy_aux_free(bs, index);
+    return ret;
 }
 
 /**
