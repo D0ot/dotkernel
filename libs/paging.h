@@ -16,45 +16,60 @@
 typedef struct {
     union {
         struct {
-            uint8_t p : 1;   // present
-            uint8_t rw : 1;  // read/write
-            uint8_t us : 1;  // user/supervisor
-            uint8_t pwt : 1; // page-level write-through
-            uint8_t pcd : 1; // page-level cache disable
-            uint8_t a : 1;   // accessed
-            uint8_t d : 1;   // dirty
-            uint8_t ps : 1;  // 1 for 4MB page, 0 for page directory
-            uint8_t g : 1;   // global page
-            uint8_t _padding : 3;
-            uint8_t pat : 1; // pat
-            uint8_t high_addr : 4;
-            uint8_t zeros : 5 ;// must be zero
-            uint16_t addr : 10;
+            uint32_t p : 1;   // present
+            uint32_t rw : 1;  // read/write
+            uint32_t us : 1;  // user/supervisor
+            uint32_t pwt : 1; // page-level write-through
+            uint32_t pcd : 1; // page-level cache disable
+            uint32_t a : 1;   // accessed
+            uint32_t d : 1;   // dirty
+            uint32_t ps : 1;  // 1 for 4MB page, 0 for page directory
+            uint32_t g : 1;   // global page
+            uint32_t _padding : 3;
+            uint32_t pat : 1; // pat
+            uint32_t high_addr : 4;
+            uint32_t zeros : 5 ;// must be zero
+            uint32_t addr : 10;
         };
         uint32_t pde;
     };
 } __attribute__((packed)) pde_t;
 
+#ifndef __cplusplus
+_Static_assert(sizeof(pde_t) == 4, "sizeof(pde_t) != 4");
+#else
+static_assert(sizeof(pde_t) == 4, "sizeof(pde_t) != 4");
+#endif
+
 
 typedef struct {
     union {
         struct {
-            uint8_t p : 1;
-            uint8_t rw : 1;
-            uint8_t us : 1;
-            uint8_t pwt : 1;
-            uint8_t pcd : 1;
-            uint8_t a : 1;
-            uint8_t d : 1;
-            uint8_t pat : 1;
-            uint8_t g : 1;
-            uint8_t _padding : 3;
+            uint32_t p : 1;
+            uint32_t rw : 1;
+            uint32_t us : 1;
+            uint32_t pwt : 1;
+            uint32_t pcd : 1;
+            uint32_t a : 1;
+            uint32_t d : 1;
+            uint32_t pat : 1;
+            uint32_t g : 1;
+            uint32_t _padding : 3;
             uint32_t addr : 20;
         };
 
         uint32_t pte;
     };
 } __attribute__((packed)) pte_t;
+
+
+#ifndef __cplusplus
+_Static_assert(sizeof(pte_t) == 4, "sizeof(pte_t) != 4");
+#else
+static_assert(sizeof(pte_t) == 4, "sizeof(pte_t) != 4");
+#endif
+
+
 
 void paging_set_pde_table_addr(pde_t* pde, uint32_t addr);
 void paging_set_pde_4m_addr(pde_t* pde, uint32_t addr, uint8_t pat);
