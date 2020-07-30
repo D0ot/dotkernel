@@ -10,3 +10,6 @@ void paging_set_pde_table_addr(pde_t* pde, uint32_t addr) {
     pde->pde = (pde->pde & (0xfff)) | (addr & (~0xfff));
 }
 
+void paging_set_pte_addr(pte_t* pte, uint32_t addr) {
+    pte->addr = (addr >> 12);
+}

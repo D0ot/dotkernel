@@ -25,6 +25,11 @@ typedef struct {
             uint8_t d : 1;   // dirty
             uint8_t ps : 1;  // 1 for 4MB page, 0 for page directory
             uint8_t g : 1;   // global page
+            uint8_t _padding : 3;
+            uint8_t pat : 1; // pat
+            uint8_t high_addr : 4;
+            uint8_t zeros : 5 ;// must be zero
+            uint16_t addr : 10;
         };
         uint32_t pde;
     };
@@ -53,6 +58,7 @@ typedef struct {
 
 void paging_set_pde_table_addr(pde_t* pde, uint32_t addr);
 void paging_set_pde_4m_addr(pde_t* pde, uint32_t addr, uint8_t pat);
+void paging_set_pte_addr(pte_t* pte, uint32_t addr);
 
 
 

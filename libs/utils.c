@@ -134,3 +134,14 @@ int abs(int value)
 {
     return value > 0 ? value : -value;
 }
+
+
+uint32_t align_to(uint32_t x, uint32_t a)
+{
+    uint32_t res = x % a;
+    if(res) {
+        return x + a - res;
+    }else {
+        return x;
+    }
+}

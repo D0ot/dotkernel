@@ -25,6 +25,8 @@ char *utoa(unsigned value, char *str, unsigned base);
 void swap(char *x, char *y);
 int abs(int value);
 
+uint32_t align_to(uint32_t x, uint32_t a);
+
 #define POWER_OF_2(X) ((1 << (X)))
 
 #endif

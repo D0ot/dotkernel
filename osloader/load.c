@@ -21,7 +21,6 @@ void osloader_memory_pre_process(MemoryRegion **pmrs, uint32_t *max_index, uint3
 {
     Mem_SMAP_Entry *smap = (void *)SMAP_ADDR + 4;
     int size = *(int *)(SMAP_ADDR);
-    *max_index = size;
     MemoryRegion * mrs = (void*)(smap) + size * SMAP_ENTRY_SIZE;
     LOG_INFO("Total memory info");
     int cnt = 0;
@@ -40,6 +39,7 @@ void osloader_memory_pre_process(MemoryRegion **pmrs, uint32_t *max_index, uint3
             cnt++;
         }
     }
+    *max_index = cnt;
     int maxsize_index = 0;
     LOG_INFO("Usuable memroy info")
     for(int i = 0; i < cnt; ++i) {
@@ -81,7 +81,7 @@ pde_t* osloader_set_up_paging(MemoryRegion *mr) {
     pde_t *pde = (pde_t*)(first4m + (KERNEL_INITIAL_4MPAGE_NUM << 22) + (4 << 20) - (4 << 10));
 
     // clear the pdes
-    memset((void*)pde, 0, 4 << 20);
+    memset((void*)pde, 0, 4 << 10);
 
     // setup pde points to pde
     pde[0x3ff].pde = PAGING_PDE_P | PAGING_PDE_RW | PAGING_PDE_US | PAGING_PDE_PCD | PAGING_PDE_PWT | PAGING_PDE_PS;
