@@ -8,3 +8,5 @@ build/*
 *.log
 *.dis
 test/build/*
+defs/defs.h
+defs/defs.s
