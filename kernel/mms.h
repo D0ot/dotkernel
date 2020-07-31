@@ -20,12 +20,13 @@ void mms_init(mms_t *mms, pde_t *pde, BuddySystem *pbs, BuddySystem *kbs, pte_t 
 void *mms_kalloc(mms_t *mms, uint32_t page_num);
 void *mms_alloc(mms_t *mms, BuddySystem *vbs, uint32_t page_num);
 void *mms_alloc_phy(mms_t *mms, uint32_t page_num);
+void mms_kfree(mms_t *mms, void *vaddr);
 void mms_free(mms_t *mms, BuddySystem *vbs, void *vaddr);
 
 
 // being used in functions below 
-void mms_map(mms_t *mms, void *vaddr, void *paddr, uint32_t page_num);
-void mms_unmap(mms_t *mms, void *vaddr, uint32_t page_num);
+void mms_map(mms_t *mms, void *vaddr, void *paddr);
+void mms_unmap(mms_t *mms, void *vaddr);
 
 
 // aux functions

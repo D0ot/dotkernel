@@ -15,9 +15,13 @@ void paging_set_pte_addr(pte_t *pte, uint32_t addr) {
 }
 
 uint32_t paging_paddr_in_pdep(pde_t *pde) {
-    return pde->pde & (0xffffffff << 22);
+    return pde->pde & 0xffc00000;
 }
 
 uint32_t paging_paddr_in_pdet(pde_t *pde) {
-    return pde->pde & (0xffffffff << 12);
+    return pde->pde & 0xfffff000;
+}
+
+uint32_t paging_paddr_in_pte(pte_t *pte) {
+    return pte->pte & 0xfffff000;
 }

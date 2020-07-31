@@ -20,10 +20,10 @@ mms_t *mem_init(KernelBootArgs *arg) {
     // mov pde to new place
     uint32_t next_free = align_to((uint32_t)arg->next_free_vaddr, 4 << 10);
     pde_t *pde_vaddr = (pde_t*)next_free;
-    memcpy((void*)pde_vaddr, (void*)(0xffc00000), sizeof(pde_t) * 1024);
-    uint32_t pde_index = next_free >> 22;
-    uint32_t pde_paddr = paging_paddr_in_pdep(pde_vaddr + pde_index) | (~0xffc00000 & next_free);
     next_free += POWER_OF_2(12);
+    memcpy((void*)pde_vaddr, (void*)(0xffc00000), sizeof(pde_t) * 1024);
+    uint32_t pde_index = (uint32_t)pde_vaddr >> 22;
+    uint32_t pde_paddr = paging_paddr_in_pdep(pde_vaddr + pde_index) | (~0xffc00000 & (uint32_t)pde_vaddr);
 
     uint32_t kernel_base_paddr = paging_paddr_in_pdep(pde_vaddr + (KERNEL_BASE >> 22));
     uint32_t pte_paddr = pde_paddr + POWER_OF_2(12);
@@ -46,9 +46,6 @@ mms_t *mem_init(KernelBootArgs *arg) {
         tmp->ps = 0;
         paging_set_pde_table_addr(tmp, pte_paddr + (i << 12));
     }
-    // set new cr3
-    x86_write_cr3(pde_paddr | (1 << 3) | (1 << 4));
-
 
     // if we want to access physical page at A_paddr
     // we can set addr in PDE to vaddr of stub_page
@@ -57,6 +54,19 @@ mms_t *mem_init(KernelBootArgs *arg) {
     // accessing B_vaddr is accessing physical page at A_paddr
     uint32_t stub_page = next_free;
     next_free += POWER_OF_2(12);
+
+    pde_vaddr[0x3ff].ps = 0;
+    paging_set_pde_table_addr(pde_vaddr + 0x3ff, pte_paddr + (4 << 12));
+
+    for(int i = 0; i < 1024; ++i) {
+        pte_vaddr[i + POWER_OF_2(12) + i].pte = 0;
+    }
+
+
+
+    // set new cr3
+    x86_write_cr3(pde_paddr | (1 << 3) | (1 << 4));
+
 
     uint32_t res_phy = (arg->mrs[arg->mr_max_length_index].length) 
         - ( (uint32_t)arg->next_free_paddr - (arg->mrs[arg->mr_max_length_index].base));
@@ -70,9 +80,9 @@ mms_t *mem_init(KernelBootArgs *arg) {
 
     // initialize the buddy system for virtual address used for kernel(from 0x8000_0000 to 0xffff_ffff)
     // 16MiB for kernel allocated
-    // the last 4MiB is used for access PTE and PDE, so minus 4 * 4MiB
-    uint32_t res_kernel = (KERNEL_BASE - ((4 << 20) * KERNEL_INITIAL_4MPAGE_NUM));
-    BuddySystem *kbs = (BuddySystem*)(next_free);
+    // the last 4MiB is used for access PTE and PDE, so minus (4+1) * 4MiB
+    uint32_t res_kernel = (KERNEL_BASE - ((4 << 20) * KERNEL_INITIAL_4MPAGE_NUM)) - (4 << 20);
+    BuddySystem *kbs = (BuddySystem*)(next_free);    
     next_free += sizeof(BuddySystem);
     buddy_init(kbs, (void*)(KERNEL_BASE + (4 << 20) * KERNEL_INITIAL_4MPAGE_NUM), res_kernel, next_free);
     next_free += buddy_get_memreq(res_kernel);
@@ -80,9 +90,10 @@ mms_t *mem_init(KernelBootArgs *arg) {
     mms_t *mms = (mms_t*)next_free;
     next_free += sizeof(mms_t);
 
-    mms_init(mms, pde_vaddr, pbs, kbs);
-    
-    
+    mms_init(mms, pde_vaddr, pbs, kbs, (pte_t*)stub_page);
+
+    arg->next_free_vaddr = next_free;
+    return mms;
 }
 
 void kernel_bootargs_log(KernelBootArgs *arg) {

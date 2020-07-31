@@ -11,7 +11,7 @@ objs = \
 	../arch/x86/interrupt.o \
 	../arch/x86/pic8259a.o \
 	../arch/x86/pit8254.o \
-	bitmap.o buddy.o main.o
+	bitmap.o buddy.o main.o mms.o
 
 
 asm_objs = start.o ../arch/x86/interrupt_asm.o 
