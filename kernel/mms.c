@@ -1,13 +1,15 @@
 #include "mms.h"
 
-void mms_init(mms_t *mms, pde_t* pde, BuddySystem *pbs) {
+void mms_init(mms_t *mms, pde_t *pde, BuddySystem *pbs, BuddySystem *kbs, pte_t *pte_stub) {
     mms->pbs = pbs;
     mms->pde = pde;
+    mms->kbs = kbs;
+    mms->pte_stub = pte_stub;
 }
 
 
 void *mms_kalloc(mms_t *mms, uint32_t page_num) {
-    return mms_alloc(mms, mms->vbs, page_num);
+    return mms_alloc(mms, mms->kbs, page_num);
 }
 
 
@@ -38,13 +40,13 @@ void mms_free(mms_t *mms, BuddySystem *vbs, void *vaddr) {
 
 
 void mms_map(mms_t *mms, void *vaddr , void *paddr, uint32_t page_num) {
+    
 }
 
 void mms_unmap(mms_t *mms, void *vaddr , uint32_t page_num) {
-
+    
 }
 
 void *mms_vir2phy(mms_t *mms, void *vaddr) {
     pde_t *pde = mms->pde + ((uint32_t)vaddr >> 22);
-    
 }

@@ -7,6 +7,7 @@ objs = \
 	../libs/kustd.o \
 	../libs/uart.o \
 	../libs/utils.o \
+	../libs/paging.o \
 	../arch/x86/interrupt.o \
 	../arch/x86/pic8259a.o \
 	../arch/x86/pit8254.o \

@@ -9,13 +9,14 @@
 typedef struct 
 {
     pde_t *pde;
+    pte_t *pte_stub;
     BuddySystem *pbs;
-    BuddySystem *vbs;
+    BuddySystem *kbs;
 } mms_t;
 
 
 // interface functions
-void mms_init(mms_t *mms, pde_t* pde, BuddySystem *pbs);
+void mms_init(mms_t *mms, pde_t *pde, BuddySystem *pbs, BuddySystem *kbs, pte_t *pte_stub);
 void *mms_kalloc(mms_t *mms, uint32_t page_num);
 void *mms_alloc(mms_t *mms, BuddySystem *vbs, uint32_t page_num);
 void *mms_alloc_phy(mms_t *mms, uint32_t page_num);

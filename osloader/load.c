@@ -78,7 +78,7 @@ void osloader_feature_check() {
 
 pde_t* osloader_set_up_paging(MemoryRegion *mr) {
     uint32_t first4m = (4 << 20) - (mr->base % (4 << 20)) + mr->base;
-    pde_t *pde = (pde_t*)(first4m + (KERNEL_INITIAL_4MPAGE_NUM << 22) + (4 << 20) - (4 << 10));
+    pde_t *pde = (pde_t*)(first4m + (KERNEL_INITIAL_4MPAGE_NUM << 22));
 
     // clear the pdes
     memset((void*)pde, 0, 4 << 10);
@@ -197,7 +197,7 @@ void osloader_main(void)
     kba.pde_vaddr = osloader_set_up_paging(kba.mrs + kba.mr_size);
     osloader_load_kernel((void*)kba.mrs->base, &kentry, &kba.next_free_vaddr);
     // 16MiB for loading kernel, 4Mib for PDEs(currently the last 4KiB is used)
-    kba.next_free_paddr = (void*)(kba.mrs[kba.mr_max_length_index].base + (4 << 20) * 5);
+    kba.next_free_paddr = (void*)(kba.mrs[kba.mr_max_length_index].base + (4 << 20) * 4);
     LOG_INFO("osloader_main, leave, jmp to kentry");
     memcpy((void*)(KERNEL_BOOT_ARGS_ADDR), (void*)&kba, sizeof(kba));
     kentry();
