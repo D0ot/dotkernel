@@ -7,6 +7,7 @@ build/*
 *.o
 *.log
 *.dis
+*.sym
 test/build/*
 defs/defs.h
 defs/defs.s
