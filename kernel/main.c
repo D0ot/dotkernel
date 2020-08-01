@@ -19,8 +19,7 @@
 mms_t *mem_init(KernelBootArgs *arg) {
 
     // mov pde to new place
-    uint32_t next_free = align_to((uint32_t)arg->next_free_vaddr, 4 << 10);
-    LOG_VAR(next_free);
+    uint32_t next_free = align_to((uint32_t)arg->next_free_vaddr, sizeof(pde_t) * 1024);
     pde_t *pde_vaddr = (pde_t*)next_free;
     next_free += sizeof(pde_t) * 1024;
     memcpy((void*)pde_vaddr, (void*)(0xffc00000), sizeof(pde_t) * 1024);
@@ -59,7 +58,6 @@ mms_t *mem_init(KernelBootArgs *arg) {
     next_free += POWER_OF_2(12);
 
     pde_vaddr[0x3ff].ps = 0;
-    pde_vaddr[0x3ff].p = 0;
     paging_set_pde_table_addr(pde_vaddr + 0x3ff, pte_paddr + (4 << 12));
 
     for(int i = 0; i < 1024; ++i) {
@@ -67,23 +65,18 @@ mms_t *mem_init(KernelBootArgs *arg) {
     }
 
 
-
     // set new cr3
     x86_write_cr3(pde_paddr | (1 << 3) | (1 << 4));
 
     uint32_t res_phy = (arg->mrs[arg->mr_max_length_index].length) 
         - ( (uint32_t)arg->next_free_paddr - (arg->mrs[arg->mr_max_length_index].base));
-    LOG_VAR(arg->next_free_paddr);
 
     // initialize the buddy system for physical address
-    next_free = align_to((uint32_t)arg->next_free_vaddr, sizeof(BuddySystem));
+    next_free = align_to(next_free, sizeof(BuddySystem));
     BuddySystem *pbs = (BuddySystem*)(next_free);
     next_free += sizeof(BuddySystem);
-    BOCHS_BREAK;
     buddy_init(pbs, arg->next_free_paddr, res_phy, (void*)next_free);
     next_free += buddy_get_memreq(res_phy);
-    LOG_VAR(buddy_get_memreq(res_phy));
-    BOCHS_BREAK;
     
 
     // initialize the buddy system for virtual address used for kernel(from 0x8000_0000 to 0xffff_ffff)
@@ -95,15 +88,12 @@ mms_t *mem_init(KernelBootArgs *arg) {
     buddy_init(kbs, (void*)(KERNEL_BASE + (4 << 20) * KERNEL_INITIAL_4MPAGE_NUM), res_kernel, (void*)next_free);
     next_free += buddy_get_memreq(res_kernel);
 
-    BOCHS_BREAK;
-
     mms_t *mms = (mms_t*)next_free;
     next_free += sizeof(mms_t);
 
     mms_init(mms, pde_vaddr, pbs, kbs, (pte_t*)stub_page);
 
     arg->next_free_vaddr = (void*)next_free;
-    BOCHS_BREAK;
     return mms;
 }
 
@@ -123,10 +113,6 @@ void kernel_main() {
     // now the low memroy(address from 0 to 4M) can be freely used
     kernel_bootargs_log(&arg);
     mms_t *mms = mem_init(&arg);
-    // void *addr = mms_kalloc(mms, POWER_OF_2(10));
-    // LOG_VAR((uint32_t)addr);
-    // memset(addr, 0, PAGE_SIZE);
-    // mms_kfree(mms, addr);
 
     x86_int_init_all_desc();
     x86_int_set_common_handle(int_handle);

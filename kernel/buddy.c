@@ -46,13 +46,13 @@ void buddy_init(BuddySystem *bs, void *managed, uint32_t managed_size, void *bud
 
 void *buddy_alloc(BuddySystem *bs, uint32_t page_num) {
     uint8_t pow = buddy_aux_fit(page_num);
-    LOG_VAR(pow);
     int32_t ret = buddy_aux_alloc(bs, pow);
-    LOG_VAR(ret);
+    void* addr = buddy_pageindex2addr(bs, ret);
+    LOG_INFO("bs@%x, alloc, page_num = %x, addr = %x", bs, POWER_OF_2(pow), addr);
     if(ret == -1) {
         return NULL;
     }
-    return buddy_pageindex2addr(bs, ret);
+    return addr;
 }
 
 /**
@@ -65,9 +65,10 @@ void *buddy_alloc(BuddySystem *bs, uint32_t page_num) {
 
 uint32_t buddy_free(BuddySystem *bs, void *addr) {
     int32_t index = buddy_addr2pageindex(bs, addr);
-    uint32_t ret = POWER_OF_2(bs->buddy_system[index].pow);
+    uint32_t page_num = POWER_OF_2(bs->buddy_system[index].pow);
+    LOG_INFO("bs@%x, free, page_num = %x, addr = %x", bs, page_num, addr);
     buddy_aux_free(bs, index);
-    return ret;
+    return page_num;
 }
 
 /**
@@ -106,7 +107,6 @@ int32_t buddy_aux_alloc(BuddySystem *bs, uint8_t pow) {
 
 void buddy_aux_free(BuddySystem *bs, int32_t page_index) {
     uint8_t pow = bs->buddy_system[page_index].pow;
-    LOG_INFO("pow : %x", (uint32_t)pow);
     int32_t last = -1;
     int32_t i = bs->indices[pow];
     if(i == -1) { 

@@ -35,6 +35,8 @@ def main():
     # symbol file load
     symbol_file_dir = join(project_path, 'debug')
     for f in listdir(symbol_file_dir):
+        if not f.endswith(".debug"):
+            continue
         full_path = join(symbol_file_dir, f)
         if(isfile(full_path)):
             myGDBAutoLoadSymFile(full_path)
