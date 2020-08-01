@@ -1,5 +1,6 @@
 #include "defs/defs.h"
 #include "libs/kustd.h"
+#include "libs/utils.h"
 #include "libs/disk.h"
 #include "libs/elf.h"
 #include "libs/log.h"
@@ -115,7 +116,7 @@ pde_t* osloader_set_up_paging(MemoryRegion *mr) {
     X86_BTS(reg, CR0_PG_BIT_OFFSET);
     x86_write_cr0(reg);
 
-    return 0xffffffff - ((4 << 20) - 1);
+    return (pde_t*)(0xffffffff - ((4 << 20) - 1));
 }
 
 
@@ -197,7 +198,7 @@ void osloader_main(void)
     kba.pde_vaddr = osloader_set_up_paging(kba.mrs + kba.mr_size);
     osloader_load_kernel((void*)kba.mrs->base, &kentry, &kba.next_free_vaddr);
     // 16MiB for loading kernel, 4Mib for PDEs(currently the last 4KiB is used)
-    kba.next_free_paddr = (void*)(kba.mrs[kba.mr_max_length_index].base + (4 << 20) * 4);
+    kba.next_free_paddr = (void*)( align_to(kba.mrs[kba.mr_max_length_index].base, POWER_OF_2(22)) + (4 << 20) * 4);
     LOG_INFO("osloader_main, leave, jmp to kentry");
     memcpy((void*)(KERNEL_BOOT_ARGS_ADDR), (void*)&kba, sizeof(kba));
     kentry();

@@ -1,4 +1,7 @@
 ata0-master: type=disk, path=build/img.bin
 boot: disk
 com1: enabled=1, mode=file, dev=com1.log
-
+magic_break: enabled=1
+debug_symbols: file=debug/boot.debug.sym
+debug_symbols: file=debug/kernel.debug.sym
+debug_symbols: file=debug/osloader.debug.sym

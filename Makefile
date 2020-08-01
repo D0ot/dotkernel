@@ -4,7 +4,7 @@ export
 
 include configs/config.mk
 
-.PHONY : all clean debug test testconf
+.PHONY : all clean debug test testconf gensym
 
 all : config
 	cd boot && make 
@@ -32,13 +32,18 @@ testconf :
 config : defs/defs.conf
 	python3 scripts/mkdefs.py defs/defs.conf defs/defs.s defs/defs.h
 
+gensym : 
+	bash scripts/gensym.sh debug/kernel.debug
+	bash scripts/gensym.sh debug/osloader.debug
+	bash scripts/gensym.sh debug/boot.debug
+
 qdebug: export DOTKERNEL_PATH = $(project_path)
 qdebug: 
 	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/run_qemu.sh
 	gnome-terminal --geometry=130x80+1600+0 -- ./scripts/debugp.sh 
 
 bdebug: export DOTKERNEL_PATH = $(project_path)
-bdebug: 
+bdebug: gensym
 	gnome-terminal --geometry=80x14+0+1200 -- ./scripts/run_bochs.sh
 
 gdebug: export DOTKERNEL_PATH = $(project_path)
